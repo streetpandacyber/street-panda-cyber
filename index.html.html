@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Street Panda Cyber - Security Downloads</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-shield-alt"></i>
+                <span>Street Panda Cyber</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#downloads">Downloads</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>🐼 Street Panda Cyber</h1>
+            <p class="tagline">Protecting Your Digital Streets</p>
+            <p class="subtitle">Download our premium cybersecurity tools and resources</p>
+            <a href="#downloads" class="cta-button">Explore Downloads</a>
+        </div>
+        <div class="hero-image">
+            <i class="fas fa-lock-open cybersecurity-icon"></i>
+        </div>
+    </section>
+
+    <!-- Downloads Section -->
+    <section id="downloads" class="downloads-section">
+        <div class="container">
+            <h2 class="section-title">📥 Available Downloads</h2>
+            <p class="section-subtitle">Free cybersecurity tools and resources for everyone</p>
+            
+            <div class="download-grid">
+                <!-- Download Card 1 -->
+                <div class="download-card">
+                    <div class="card-icon">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+                    <h3>Security Guide 2024</h3>
+                    <p class="description">Complete cybersecurity best practices guide</p>
+                    <div class="file-info">
+                        <span class="file-size"><i class="fas fa-database"></i> 2.5 MB</span>
+                        <span class="file-type">PDF</span>
+                    </div>
+                    <a href="files/security-guide.pdf" download="Street-Panda-Security-Guide.pdf" class="download-btn" onclick="trackDownload('Security Guide')">
+                        <i class="fas fa-download"></i> Download PDF
+                    </a>
+                    <p class="download-count" id="count-1">0 downloads</p>
+                </div>
+
+                <!-- Download Card 2 -->
+                <div class="download-card">
+                    <div class="card-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h3>Panda Security Scripts</h3>
+                    <p class="description">Automated security scanning scripts</p>
+                    <div class="file-info">
+                        <span class="file-size"><i class="fas fa-database"></i> 1.8 MB</span>
+                        <span class="file-type">ZIP</span>
+                    </div>
+                    <a href="files/security-scripts.zip" download="Panda-Security-Scripts.zip" class="download-btn" onclick="trackDownload('Security Scripts')">
+                        <i class="fas fa-download"></i> Download ZIP
+                    </a>
+                    <p class="download-count" id="count-2">0 downloads</p>
+                </div>
+
+                <!-- Download Card 3 -->
+                <div class="download-card">
+                    <div class="card-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Malware Detection Tool</h3>
+                    <p class="description">Lightweight malware scanning utility</p>
+                    <div class="file-info">
+                        <span class="file-size"><i class="fas fa-database"></i> 5.2 MB</span>
+                        <span class="file-type">EXE</span>
+                    </div>
+                    <a href="files/malware-detector.exe" download="Panda-Malware-Detector.exe" class="download-btn" onclick="trackDownload('Malware Tool')">
+                        <i class="fas fa-download"></i> Download Tool
+                    </a>
+                    <p class="download-count" id="count-3">0 downloads</p>
+                </div>
+
+                <!-- Download Card 4 -->
+                <div class="download-card">
+                    <div class="card-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <h3>Cyber Awareness Training</h3>
+                    <p class="description">Employee security training materials</p>
+                    <div class="file-info">
+                        <span class="file-size"><i class="fas fa-database"></i> 12 MB</span>
+                        <span class="file-type">ZIP</span>
+                    </div>
+                    <a href="files/training-materials.zip" download="Cyber-Training-Pack.zip" class="download-btn" onclick="trackDownload('Training Materials')">
+                        <i class="fas fa-download"></i> Download Pack
+                    </a>
+                    <p class="download-count" id="count-4">0 downloads</p>
+                </div>
+
+                <!-- Download Card 5 -->
+                <div class="download-card">
+                    <div class="card-icon">
+                        <i class="fas fa-key"></i>
+                    </div>
+                    <h3>Password Manager</h3>
+                    <p class="description">Secure password management tool</p>
+                    <div class="file-info">
+                        <span class="file-size"><i class="fas fa-database"></i> 3.1 MB</span>
+                        <span class="file-type">ZIP</span>
+                    </div>
+                    <a href="files/password-manager.zip" download="Panda-Password-Manager.zip" class="download-btn" onclick="trackDownload('Password Manager')">
+                        <i class="fas fa-download"></i> Download
+                    </a>
+                    <p class="download-count" id="count-5">0 downloads</p>
+                </div>
+
+                <!-- Download Card 6 -->
+                <div class="download-card">
+                    <div class="card-icon">
+                        <i class="fas fa-network-wired"></i>
+                    </div>
+                    <h3>Network Scanner</h3>
+                    <p class="description">Scan your network for vulnerabilities</p>
+                    <div class="file-info">
+                        <span class="file-size"><i class="fas fa-database"></i> 4.7 MB</span>
+                        <span class="file-type">EXE</span>
+                    </div>
+                    <a href="files/network-scanner.exe" download="Panda-Network-Scanner.exe" class="download-btn" onclick="trackDownload('Network Scanner')">
+                        <i class="fas fa-download"></i> Download
+                    </a>
+                    <p class="download-count" id="count-6">0 downloads</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about-section">
+        <div class="container">
+            <h2 class="section-title">About Street Panda Cyber</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <p>🐼 <strong>Street Panda Cyber</strong> is your trusted partner in cybersecurity. We provide free, professional-grade security tools and resources to help individuals and businesses protect their digital assets.</p>
+                    <p>Our mission is to make cybersecurity accessible to everyone, from small businesses to enterprise organizations.</p>
+                    <div class="features">
+                        <div class="feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>100% Free Tools</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Regular Updates</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Professional Support</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Open Source</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact-section">
+        <div class="container">
+            <h2 class="section-title">Get In Touch</h2>
+            <div class="contact-info">
+                <div class="contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <p>info@streetpandacyber.com</p>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-globe"></i>
+                    <p>www.streetpandacyber.com</p>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-phone"></i>
+                    <p>+1 (555) 123-4567</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Street Panda Cyber. All rights reserved.</p>
+            <p>Protecting Your Digital Streets 🐼</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
