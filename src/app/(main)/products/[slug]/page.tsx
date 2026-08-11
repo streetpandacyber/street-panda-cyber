@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 import {
   getProductBySlug,
-  getProducts,
   getRelatedProducts,
 } from "@/lib/data/service";
 import { MOCK_REVIEWS, productRatingBreakdown } from "@/lib/data/mock";
@@ -78,10 +77,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const related = await getRelatedProducts(product);
   const ownReviews = MOCK_REVIEWS.filter((r) => r.product_id === product.id);
   const reviews = (ownReviews.length > 0 ? ownReviews : MOCK_REVIEWS).slice(0, 3);
-  const breakdown = productRatingBreakdown(
-    product.average_rating,
-    product.review_count ?? 0
-  );
+  const breakdown = productRatingBreakdown(product.review_count ?? 0);
 
   const onSale =
     product.sale_price !== undefined && product.sale_price < product.price;

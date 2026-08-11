@@ -23,12 +23,10 @@ export function StickyBottomNav() {
       <div className="glass border-t border-white/20 shadow-[0_-4px_24px_rgba(26,41,128,0.10)]">
         <nav className="flex items-stretch justify-around px-1 py-1.5">
           {LINKS.map((link) => {
+            const href = typeof link.href === "string" ? link.href : null;
             const active =
-              !link.cart &&
-              link.href !== undefined &&
-              (link.href === "/"
-                ? pathname === "/"
-                : pathname.startsWith(link.href));
+              href !== null &&
+              (href === "/" ? pathname === "/" : pathname.startsWith(href));
 
             if (link.cart) {
               return (
@@ -55,7 +53,7 @@ export function StickyBottomNav() {
             return (
               <Link
                 key={link.label}
-                href={link.href ?? "/"}
+                href={href ?? "/"}
                 className={cn(
                   "flex min-h-[44px] flex-1 flex-col items-center justify-center gap-0.5 rounded-xl py-1 transition-colors",
                   active ? "text-orange-600" : "text-gray-500"

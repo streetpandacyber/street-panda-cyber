@@ -1,15 +1,12 @@
 import Link from "next/link";
+import { Mail, MapPin, Phone, Zap } from "lucide-react";
 import {
-  Facebook,
-  Instagram,
-  Linkedin,
-  Mail,
-  MapPin,
-  Phone,
-  Twitter,
-  Youtube,
-  Zap,
-} from "lucide-react";
+  FacebookIcon,
+  InstagramIcon,
+  LinkedinIcon,
+  TwitterIcon,
+  YoutubeIcon,
+} from "./SocialIcons";
 import { NewsletterForm } from "./NewsletterForm";
 
 const QUICK_LINKS = [
@@ -132,11 +129,11 @@ export function Footer() {
             </ul>
             <div className="mt-6 flex gap-2">
               {[
-                { icon: Twitter, label: "Twitter", href: "https://twitter.com/jmmajiwa" },
-                { icon: Instagram, label: "Instagram", href: "https://instagram.com/jmmajiwa" },
-                { icon: Facebook, label: "Facebook", href: "https://facebook.com/jmmajiwa" },
-                { icon: Youtube, label: "YouTube", href: "https://youtube.com/@jmmajiwa" },
-                { icon: Linkedin, label: "LinkedIn", href: "https://linkedin.com/company/jmmajiwa" },
+                { icon: TwitterIcon, label: "Twitter", href: "https://twitter.com/jmmajiwa" },
+                { icon: InstagramIcon, label: "Instagram", href: "https://instagram.com/jmmajiwa" },
+                { icon: FacebookIcon, label: "Facebook", href: "https://facebook.com/jmmajiwa" },
+                { icon: YoutubeIcon, label: "YouTube", href: "https://youtube.com/@jmmajiwa" },
+                { icon: LinkedinIcon, label: "LinkedIn", href: "https://linkedin.com/company/jmmajiwa" },
               ].map(({ icon: Icon, label, href }) => (
                 <a
                   key={label}

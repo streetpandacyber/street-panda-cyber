@@ -12,6 +12,7 @@ import {
 } from "recharts";
 import {
   ArrowUpRight,
+  BarChart3,
   DollarSign,
   Package,
   PlusCircle,
@@ -87,7 +88,7 @@ export default function AdminDashboard() {
     totalProducts: 128,
   });
   const [orders, setOrders] = useState<Partial<Order>[]>(DEMO_ORDERS);
-  const [revenue, setRevenue] = useState(DEMO_REVENUE);
+  const revenue = DEMO_REVENUE;
 
   useEffect(() => {
     if (!configured) return;

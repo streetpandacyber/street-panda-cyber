@@ -166,9 +166,15 @@ export async function getBundles(): Promise<Bundle[]> {
       .eq("is_published", true)
       .order("created_at", { ascending: false });
     if (error || !data?.length) return null;
-    return (data as unknown as (Bundle & { products: { products: Product }[] })[]).map(
-      (b) => ({ ...b, products: b.products.map((bp) => bp.products) })
-    );
+    type BundleRow = Omit<Bundle, "products"> & {
+      products: { products: Product }[];
+    };
+    return (data as unknown as BundleRow[]).map(({ products, ...rest }) => ({
+      ...rest,
+      products: products
+        .map((bp) => bp.products)
+        .filter((prod): prod is Product => Boolean(prod)),
+    }));
   });
   return db ?? MOCK_BUNDLES;
 }

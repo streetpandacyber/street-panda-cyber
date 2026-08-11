@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { createServerClient } from "@supabase/ssr";
 import { updateSession } from "@/lib/supabase/middleware";
 
 export async function middleware(request: NextRequest) {
@@ -31,12 +31,9 @@ export async function middleware(request: NextRequest) {
         get(name: string) {
           return request.cookies.get(name)?.value;
         },
-        set(_name: string, _value: string, _options: CookieOptions) {
-          /* read-only check in middleware */
-        },
-        remove(_name: string, _options: CookieOptions) {
-          /* read-only check in middleware */
-        },
+        // read-only check in middleware — writes are handled by updateSession
+        set: () => {},
+        remove: () => {},
       },
     });
 

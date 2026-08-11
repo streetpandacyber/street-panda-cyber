@@ -875,7 +875,7 @@ export const MOCK_REVIEWS: Review[] = [
 
 /* ────────────────────────────── HELPERS ─────────────────────────── */
 
-export function productRatingBreakdown(rating = 4.8, count = 120) {
+export function productRatingBreakdown(count = 120) {
   const five = Math.round(count * 0.78);
   const four = Math.round(count * 0.16);
   const three = Math.round(count * 0.04);

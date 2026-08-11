@@ -109,9 +109,13 @@ export async function GET(_request: NextRequest, { params }: RouteContext) {
       .update({ download_count: item.download_count + 1 })
       .eq("id", item.id);
     if (item.product_id) {
-      await supabase.rpc("increment_product_downloads", {
-        product_row_id: item.product_id,
-      }).catch((e: unknown) => console.warn("[downloads] rpc", e));
+      try {
+        await supabase.rpc("increment_product_downloads", {
+          product_row_id: item.product_id,
+        });
+      } catch (e) {
+        console.warn("[downloads] rpc", e);
+      }
     }
 
     return NextResponse.json({ download_url: downloadUrl });

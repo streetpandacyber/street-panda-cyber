@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { nanoid } from "nanoid";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendEmail } from "@/lib/email";
-import { OrderConfirmation } from "../../../../emails/OrderConfirmation";
+import { OrderConfirmation } from "../../../../../emails/OrderConfirmation";
 import { APP_URL } from "@/lib/env";
 
 export const runtime = "nodejs";
@@ -70,9 +70,13 @@ export async function POST(request: NextRequest) {
       // Increment product sales counters
       for (const item of order.order_items ?? []) {
         if (item.product_id) {
-          await supabase.rpc("increment_product_sales", {
-            product_row_id: item.product_id,
-          }).catch((e: unknown) => console.warn("[mpesa:callback] rpc", e));
+          try {
+            await supabase.rpc("increment_product_sales", {
+              product_row_id: item.product_id,
+            });
+          } catch (e) {
+            console.warn("[mpesa:callback] rpc", e);
+          }
         }
       }
 
