@@ -61,7 +61,7 @@ const FAQS = [
   {
     question: "Can I get a refund?",
     answer:
-      "Yes — every purchase is covered by our 30-day money-back guarantee. If the product isn't what you expected, email support@jmmajiwa.com for a full refund.",
+      "Yes — every purchase is covered by our 30-day money-back guarantee. If the product isn't what you expected, email streetpandacyber@gmail.com for a full refund.",
   },
   {
     question: "Do I get future updates?",
@@ -301,7 +301,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </h2>
             <p className="mt-3 text-gray-500">
               Everything you need to know before buying. Still unsure? Email us
-              at support@jmmajiwa.com.
+              at streetpandacyber@gmail.com.
             </p>
           </div>
           <FaqAccordion items={FAQS} />

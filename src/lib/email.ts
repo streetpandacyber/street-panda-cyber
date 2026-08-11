@@ -20,7 +20,7 @@ export async function sendEmail({ to, subject, react }: SendEmailOptions) {
 
   const resend = new Resend(process.env.RESEND_API_KEY);
   const fromName = process.env.FROM_NAME ?? "JM Majiwa";
-  const fromEmail = process.env.FROM_EMAIL ?? "noreply@jmmajiwa.com";
+  const fromEmail = process.env.FROM_EMAIL ?? "streetpandacyber@gmail.com";
   const html = await render(react);
 
   return resend.emails.send({

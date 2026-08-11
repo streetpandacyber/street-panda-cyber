@@ -89,7 +89,7 @@ export default function TermsPage() {
       <LegalSection heading="10. Changes & Termination">
         <p>
           We may update these terms from time to time and may suspend accounts
-          that violate them. Questions? Email support@jmmajiwa.com.
+          that violate them. Questions? Email streetpandacyber@gmail.com.
         </p>
       </LegalSection>
     </LegalLayout>

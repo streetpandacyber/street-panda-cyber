@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import { Mail, MapPin, MessageCircle } from "lucide-react";
 import { ContactForm } from "@/components/contact/ContactForm";
 
 export const metadata: Metadata = {
@@ -16,7 +16,7 @@ const FAQS = [
   },
   {
     q: "Can I get a refund?",
-    a: "Yes — every purchase has a 30-day money-back guarantee. Just email support@jmmajiwa.com.",
+    a: "Yes — every purchase has a 30-day money-back guarantee. Just email streetpandacyber@gmail.com.",
   },
   {
     q: "Do you offer bulk or school pricing?",
@@ -62,19 +62,24 @@ export default function ContactPage() {
                   </span>
                   <div>
                     <p className="font-semibold text-navy-800">Email</p>
-                    <a href="mailto:support@jmmajiwa.com" className="text-gray-500 hover:text-orange-600">
-                      support@jmmajiwa.com
+                    <a href="mailto:streetpandacyber@gmail.com" className="text-gray-500 hover:text-orange-600">
+                      streetpandacyber@gmail.com
                     </a>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-neon-50">
-                    <Phone className="h-5 w-5 text-neon-600" />
+                    <MessageCircle className="h-5 w-5 text-neon-600" />
                   </span>
                   <div>
-                    <p className="font-semibold text-navy-800">Phone / WhatsApp</p>
-                    <a href="tel:+254700000000" className="text-gray-500 hover:text-orange-600">
-                      +254 700 000 000
+                    <p className="font-semibold text-navy-800">WhatsApp</p>
+                    <a
+                      href="https://wa.me/254745198099"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-500 hover:text-orange-600"
+                    >
+                      +254 745 198 099 — chat with us
                     </a>
                   </div>
                 </li>

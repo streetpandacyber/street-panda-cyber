@@ -28,7 +28,7 @@ export default function RefundPolicyPage() {
 
       <LegalSection heading="How to request a refund">
         <ol className="list-inside list-decimal space-y-1">
-          <li>Email support@jmmajiwa.com with your order number.</li>
+          <li>Email streetpandacyber@gmail.com with your order number.</li>
           <li>Tell us briefly what didn&apos;t meet expectations.</li>
           <li>
             We process the refund within 3–5 business days, back to your M-Pesa
@@ -60,8 +60,8 @@ export default function RefundPolicyPage() {
         <p>
           Before refunding, consider reaching out — many issues are fixable in
           minutes. Contact{" "}
-          <a href="mailto:support@jmmajiwa.com" className="font-semibold text-orange-600">
-            support@jmmajiwa.com
+          <a href="mailto:streetpandacyber@gmail.com" className="font-semibold text-orange-600">
+            streetpandacyber@gmail.com
           </a>{" "}
           or visit the{" "}
           <Link href="/contact" className="font-semibold text-orange-600">

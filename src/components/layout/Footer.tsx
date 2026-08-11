@@ -107,19 +107,21 @@ export function Footer() {
               <li className="flex items-start gap-2.5">
                 <Mail className="mt-0.5 h-4 w-4 shrink-0 text-orange-400" />
                 <a
-                  href="mailto:support@jmmajiwa.com"
+                  href="mailto:streetpandacyber@gmail.com"
                   className="transition-colors hover:text-orange-400"
                 >
-                  support@jmmajiwa.com
+                  streetpandacyber@gmail.com
                 </a>
               </li>
               <li className="flex items-start gap-2.5">
                 <Phone className="mt-0.5 h-4 w-4 shrink-0 text-orange-400" />
                 <a
-                  href="tel:+254700000000"
+                  href="https://wa.me/254745198099"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="transition-colors hover:text-orange-400"
                 >
-                  +254 700 000 000
+                  +254 745 198 099 (WhatsApp)
                 </a>
               </li>
               <li className="flex items-start gap-2.5">

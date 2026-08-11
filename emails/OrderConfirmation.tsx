@@ -123,8 +123,8 @@ export function OrderConfirmation({
 
             <Text style={paragraphSmall}>
               Need help? Reply to this email or write to{" "}
-              <a href="mailto:support@jmmajiwa.com" style={link}>
-                support@jmmajiwa.com
+              <a href="mailto:streetpandacyber@gmail.com" style={link}>
+                streetpandacyber@gmail.com
               </a>{" "}
               — we answer within hours.
             </Text>

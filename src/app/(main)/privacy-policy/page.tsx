@@ -62,8 +62,8 @@ export default function PrivacyPolicyPage() {
         <p>
           You may request access to, correction of, or deletion of your personal
           data at any time by emailing{" "}
-          <a href="mailto:support@jmmajiwa.com" className="font-semibold text-orange-600">
-            support@jmmajiwa.com
+          <a href="mailto:streetpandacyber@gmail.com" className="font-semibold text-orange-600">
+            streetpandacyber@gmail.com
           </a>
           . Newsletter emails include a one-click unsubscribe link.
         </p>

@@ -65,7 +65,7 @@ export async function GET(_request: NextRequest, { params }: RouteContext) {
       return NextResponse.json(
         {
           error:
-            "Download limit reached. Contact support@jmmajiwa.com if you need more access.",
+            "Download limit reached. Contact streetpandacyber@gmail.com if you need more access.",
         },
         { status: 429 }
       );
