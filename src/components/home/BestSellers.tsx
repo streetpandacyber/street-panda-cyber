@@ -1,10 +1,15 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { getProducts } from "@/lib/data/service";
 import { MOCK_PRODUCTS } from "@/lib/data/mock";
 import { ProductCard } from "@/components/marketplace/ProductCard";
 
-export function BestSellers() {
-  const bestSellers = MOCK_PRODUCTS.filter((p) => p.is_best_seller).slice(0, 6);
+export async function BestSellers() {
+  const products = await getProducts({});
+  const bestSellers =
+    products.filter((p) => p.is_best_seller).slice(0, 6).length > 0
+      ? products.filter((p) => p.is_best_seller).slice(0, 6)
+      : MOCK_PRODUCTS.filter((p) => p.is_best_seller).slice(0, 6);
 
   return (
     <section className="section-padding bg-gray-50">

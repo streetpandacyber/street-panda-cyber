@@ -4,11 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Check, Gift } from "lucide-react";
+import type { Bundle } from "@/types";
 import { MOCK_BUNDLES } from "@/lib/data/mock";
 import { calculateDiscount, formatPrice } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
-export function FeaturedBundles() {
+export function FeaturedBundles({ bundles }: { bundles?: Bundle[] }) {
+  const list = (bundles && bundles.length > 0 ? bundles : MOCK_BUNDLES).slice(0, 3);
   return (
     <section className="section-padding bg-white">
       <div className="container-custom">
@@ -29,7 +31,7 @@ export function FeaturedBundles() {
         </motion.div>
 
         <div className="mt-14 grid grid-cols-1 gap-8 md:grid-cols-3">
-          {MOCK_BUNDLES.map((bundle, i) => {
+          {list.map((bundle, i) => {
             const savings = bundle.original_price - bundle.bundle_price;
             const pct = calculateDiscount(bundle.original_price, bundle.bundle_price);
             const popular = i === 1;

@@ -1,3 +1,4 @@
+import { getBlogPosts, getBundles } from "@/lib/data/service";
 import { HeroSection } from "@/components/home/HeroSection";
 import { FeaturedCategories } from "@/components/home/FeaturedCategories";
 import { BestSellers } from "@/components/home/BestSellers";
@@ -9,18 +10,22 @@ import { TrustSection } from "@/components/home/TrustSection";
 import { LearningHubPreview } from "@/components/home/LearningHubPreview";
 import { NewsletterSection } from "@/components/home/NewsletterSection";
 
-export default function HomePage() {
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const [bundles, posts] = await Promise.all([getBundles(), getBlogPosts()]);
+
   return (
     <>
       <HeroSection />
       <FeaturedCategories />
       <BestSellers />
       <HowItWorks />
-      <FeaturedBundles />
+      <FeaturedBundles bundles={bundles} />
       <WhyChooseUs />
       <Testimonials />
       <TrustSection />
-      <LearningHubPreview />
+      <LearningHubPreview posts={posts} />
       <NewsletterSection />
     </>
   );
