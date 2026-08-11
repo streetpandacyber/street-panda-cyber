@@ -1,0 +1,32 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Env
+.env
+.env.local
+
+# Build (if ever added)
+dist/
+build/
+node_modules/
+
+# Placeholders to keep files folder but ignore large binaries in future if needed? No, we want binaries.
+# Uncomment if you move to GitHub Releases for binaries:
+# files/*.exe
+# files/*.zip
+# files/*.pdf
+# !files/checksums.sha256
+# !files/README.md
