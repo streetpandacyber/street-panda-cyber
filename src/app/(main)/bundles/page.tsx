@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { Check, Gift, ShieldCheck, Zap } from "lucide-react";
 import { getBundles } from "@/lib/data/service";
 import { calculateDiscount, formatPrice } from "@/lib/utils";
@@ -24,30 +23,16 @@ export default async function BundlesPage() {
         <div className="pointer-events-none absolute -left-24 top-0 h-72 w-72 rounded-full bg-orange-500/25 blur-[100px]" />
         <div className="pointer-events-none absolute -right-24 bottom-0 h-72 w-72 rounded-full bg-neon-400/20 blur-[100px]" />
         <div className="container-custom relative">
-          <motion.span
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="badge inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-xs font-semibold"
-          >
+          <span className="badge inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-xs font-semibold animate-fade-up opacity-0">
             🎁 Bundle Deals
-          </motion.span>
-          <motion.h1
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.07 }}
-            className="mt-5 text-4xl font-extrabold md:text-5xl"
-          >
+          </span>
+          <h1 className="mt-5 animate-fade-up animation-delay-100 text-4xl font-extrabold opacity-0 md:text-5xl">
             Save Up To <span className="text-gradient-orange">67%</span> With Bundles
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.14 }}
-            className="mx-auto mt-4 max-w-2xl text-lg text-white/70"
-          >
+          </h1>
+          <p className="mx-auto mt-4 max-w-2xl animate-fade-up animation-delay-200 text-lg text-white/70 opacity-0">
             Our best-selling products grouped together at one unbeatable price.
             One M-Pesa payment, instant downloads, lifetime access.
-          </motion.p>
+          </p>
         </div>
       </section>
 
@@ -58,15 +43,12 @@ export default async function BundlesPage() {
             const savings = bundle.original_price - bundle.bundle_price;
             const pct = calculateDiscount(bundle.original_price, bundle.bundle_price);
             return (
-              <motion.div
+              <div
                 key={bundle.id}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-40px" }}
-                transition={{ duration: 0.45, delay: i * 0.07 }}
-                className={`card-premium relative flex h-full flex-col overflow-hidden ${
+                className={`card-premium relative flex h-full animate-fade-up flex-col overflow-hidden opacity-0 ${
                   i === 1 ? "ring-2 ring-orange-500" : ""
                 }`}
+                style={{ animationDelay: `${i * 70}ms` }}
               >
                 {i === 1 && (
                   <span className="absolute right-4 top-4 z-10 badge bg-orange-500 text-white shadow-glow-orange">
@@ -124,7 +106,7 @@ export default async function BundlesPage() {
                     automatically at checkout.
                   </p>
                 </div>
-              </motion.div>
+              </div>
             );
           })}
         </div>
