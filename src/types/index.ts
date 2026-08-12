@@ -40,6 +40,9 @@ export interface BlogPost {
   view_count: number;
   read_time?: number;
   published_at?: string;
+  author_name?: string;
+  author_bio?: string;
+  author_avatar_url?: string;
   created_at: string;
   updated_at: string;
 }

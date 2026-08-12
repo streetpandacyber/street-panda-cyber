@@ -11,7 +11,7 @@ import { createClient } from "@/lib/supabase/server";
 import {
   MOCK_BUNDLES,
   MOCK_CATEGORIES,
-  MOCK_POSTS,
+  MOCK_POSTS_ALL,
   MOCK_PRODUCTS,
 } from "./mock";
 
@@ -194,7 +194,7 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
     if (error || !data?.length) return null;
     return data as BlogPost[];
   });
-  return db ?? MOCK_POSTS;
+  return db ?? MOCK_POSTS_ALL;
 }
 
 export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
@@ -207,7 +207,7 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
     if (error || !data) return null;
     return data as BlogPost;
   });
-  return db ?? MOCK_POSTS.find((p) => p.slug === slug) ?? null;
+  return db ?? MOCK_POSTS_ALL.find((p) => p.slug === slug) ?? null;
 }
 
 /* ───────────── Extended queries for the backend API ───────────── */

@@ -1,4 +1,5 @@
 import type { BlogPost, Bundle, Category, Product, Review } from "@/types";
+import { NEW_SEED_POSTS } from "./newPosts";
 
 const now = "2026-07-01T09:00:00.000Z";
 
@@ -658,8 +659,9 @@ export const MOCK_POSTS: BlogPost[] = [
     content:
       "<p>Most entrepreneurs in Kenya use ChatGPT like a search engine. That works, but it leaves 90% of the value on the table. The difference between a mediocre answer and a brilliant one is almost always the prompt.</p><h2>1. The M-Pesa follow-up message</h2><p>Ask ChatGPT to write three polite payment follow-up messages for different stages: 3 days overdue, 7 days overdue, and final notice. You will never dread chasing invoices again.</p><h2>2. The product description generator</h2><p>Paste your product details and ask for five descriptions: one for WhatsApp status, one for Instagram, one for a website, one for a flyer, and one for a radio mention.</p><h2>3. The tender summariser</h2><p>Upload a tender document and ask ChatGPT to list the requirements, deadlines and disqualifying criteria in a table. Hours of reading reduced to two minutes.</p><h2>Start today</h2><p>These three prompts alone save our users an average of six hours per week. Our <strong>Ultimate ChatGPT Prompt Pack 500</strong> includes 497 more — organised by business type and ready to copy-paste.</p>",
     cover_image_url: img("photo-1677442136019-21780ecad995"),
-    category: "AI & Prompts",
+    category: "AI",
     tags: ["chatgpt", "prompts", "business"],
+    author_name: "JM Majiwa",
     is_published: true,
     is_featured: true,
     view_count: 12840,
@@ -677,8 +679,9 @@ export const MOCK_POSTS: BlogPost[] = [
     content:
       "<p>Canva has quietly become the most powerful free tool for Kenyan creators and small businesses. Here is how to go from complete beginner to producing agency-level designs.</p><h2>Start with templates, not blank canvases</h2><p>Professional designers start from scratch; you should not. Search for the format you need, pick a template close to your vision, then customise colours, fonts and photos. You will be 10x faster.</p><h2>Lock a two-font system</h2><p>Choose one bold font for headings and one clean font for body text. Use them everywhere. Consistency is what makes a brand look expensive.</p><h2>Use the Brand Kit (even on free)</h2><p>Save your logo, your three brand colours, and your two fonts. Every design becomes a five-minute job instead of a thirty-minute job.</p><h2>Practice with our templates</h2><p>The fastest way to learn is to edit real designs. Our <strong>Canva Social Media Mega Pack</strong> gives you 300+ professional templates to reverse-engineer and make your own.</p>",
     cover_image_url: img("photo-1626785774573-4b799315345d"),
-    category: "Design",
+    category: "Canva",
     tags: ["canva", "design", "tutorial"],
+    author_name: "Achieng O.",
     is_published: true,
     is_featured: true,
     view_count: 9620,
@@ -696,8 +699,9 @@ export const MOCK_POSTS: BlogPost[] = [
     content:
       "<p>Five years ago, talking about AI in a Kenyan boardroom sounded futuristic. Today, a mama mboga with a smartphone can use the same tools as a Fortune 500 company. Here is what is actually being used.</p><h2>ChatGPT for customer communication</h2><p>Businesses use it to draft WhatsApp replies, product descriptions and marketing copy in seconds. The businesses winning are the ones with good prompt libraries.</p><h2>Canva AI for marketing at scale</h2><p>One person can now produce a month of social content in an afternoon using template systems and AI image generation.</p><h2>Gemini for research</h2><p>Deep Research briefs that used to take consultants weeks now take minutes. Perfect for market entry studies and competitor analysis.</p><h2>The takeaway</h2><p>You do not need to master every tool. Pick one workflow — customer replies, content creation, or research — and build a prompt system around it. Our prompt packs give you the exact systems.</p>",
     cover_image_url: img("photo-1485827404703-89b55fcc595e"),
-    category: "AI & Prompts",
+    category: "AI",
     tags: ["ai", "business", "tools"],
+    author_name: "JM Majiwa",
     is_published: true,
     is_featured: true,
     view_count: 8710,
@@ -717,6 +721,7 @@ export const MOCK_POSTS: BlogPost[] = [
     cover_image_url: img("photo-1563013544-824ae1b704d3"),
     category: "Business",
     tags: ["digital-products", "mpesa", "selling"],
+    author_name: "JM Majiwa",
     is_published: true,
     is_featured: false,
     view_count: 7325,
@@ -734,8 +739,9 @@ export const MOCK_POSTS: BlogPost[] = [
     content:
       "<p>Cramming does not work. A structured 30-day plan does. Here is the exact structure we recommend to KCSE candidates.</p><h2>Week 1: Foundations</h2><p>Spend two days per your weakest three subjects. Topical notes first, then ten past-paper questions per topic. Mark yourself harshly.</p><h2>Week 2: Past papers</h2><p>One full past paper per subject under timed conditions. The goal is not marks — it is learning how examiners phrase questions.</p><h2>Week 3: Gaps and marking schemes</h2><p>Revisit every question you got wrong. Study the marking scheme itself: examiners award marks for specific keywords and structures.</p><h2>Week 4: Exam simulation</h2><p>Prediction papers, early nights, and light review only. Sleep is a revision tool — candidates who sleep 7+ hours score measurably higher.</p><h2>Get the materials</h2><p>Our <strong>Kenya KCSE Study Bundle</strong> includes the topical notes, 10 years of past papers with schemes, and a printable version of this exact timetable.</p>",
     cover_image_url: img("photo-1456513080510-7bf3a84b82f8"),
-    category: "Education",
+    category: "Kenya",
     tags: ["kcse", "study", "timetable"],
+    author_name: "JM Majiwa",
     is_published: true,
     is_featured: false,
     view_count: 11208,
@@ -755,6 +761,7 @@ export const MOCK_POSTS: BlogPost[] = [
     cover_image_url: img("photo-1553877522-43269d4ea984"),
     category: "Business",
     tags: ["creators", "side-hustle", "growth"],
+    author_name: "Achieng O.",
     is_published: true,
     is_featured: false,
     view_count: 5890,
@@ -763,6 +770,30 @@ export const MOCK_POSTS: BlogPost[] = [
     created_at: "2026-05-20T08:00:00.000Z",
     updated_at: "2026-05-20T08:00:00.000Z",
   },
+];
+
+/** Merge the five full-length PROMPT-6 articles into the demo list. */
+export const MOCK_POSTS_ALL: BlogPost[] = [
+  ...NEW_SEED_POSTS.map((p) => ({
+    id: p.id,
+    title: p.title,
+    slug: p.slug,
+    excerpt: p.excerpt,
+    content: p.content,
+    cover_image_url: `https://images.unsplash.com/${p.cover}?auto=format&fit=crop&w=900&q=75`,
+    category: p.category,
+    tags: p.tags,
+    is_published: true,
+    is_featured: p.id === "n-01",
+    view_count: 4200 + (p.read_time ?? 5) * 210,
+    read_time: p.read_time,
+    author_name: p.author_name,
+    author_bio: p.author_bio,
+    published_at: "2026-08-02T08:00:00Z",
+    created_at: "2026-08-02T08:00:00Z",
+    updated_at: "2026-08-02T08:00:00Z",
+  })),
+  ...MOCK_POSTS,
 ];
 
 /* ─────────────────────────── TESTIMONIALS ───────────────────────── */
