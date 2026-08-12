@@ -45,7 +45,9 @@ export function useDashboard(requireAuth = true): DashboardState {
           supabase.from("profiles").select("*").eq("id", u.id).single(),
           supabase
             .from("orders")
-            .select("*, order_items(*)")
+            .select(
+              "*, order_items(*, product:products(title, slug, thumbnail_url, file_format, file_size, category:categories(name)))"
+            )
             .eq("user_id", u.id)
             .order("created_at", { ascending: false }),
         ]);
