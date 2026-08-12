@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
 
       const downloadToken = nanoid(32);
       const expiresAt = new Date(
-        Date.now() + 30 * 24 * 60 * 60 * 1000
+        Date.now() + 365 * 24 * 60 * 60 * 1000
       ).toISOString();
 
       await supabase
@@ -94,12 +94,16 @@ export async function POST(request: NextRequest) {
               price: i.price,
             })),
             total: order.total,
-            downloadUrl: `${APP_URL}/dashboard/downloads`,
+            downloadUrl: `${APP_URL}/downloads/${downloadToken}`,
           }),
         });
       } catch (emailErr) {
         console.error("[mpesa:callback] email failed", emailErr);
       }
+
+      console.log(
+        `[mpesa:callback] ✅ order ${order.order_number} paid — receipt ${receipt}, token issued, email queued to ${order.customer_email}`
+      );
     } else {
       // ── Payment failed / cancelled by user ───────────────
       await supabase

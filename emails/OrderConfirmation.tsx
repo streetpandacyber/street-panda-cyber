@@ -117,7 +117,7 @@ export function OrderConfirmation({
 
             <Section style={buttonSection}>
               <Button style={button} href={downloadUrl}>
-                Download My Products
+                Download Your Products
               </Button>
             </Section>
 
