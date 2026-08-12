@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { nanoid } from "nanoid";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getProductsPaged } from "@/lib/data/service";
+import { isSupabaseConfigured } from "@/lib/env";
+import { MOCK_PRODUCTS } from "@/lib/data/mock";
 import {
   apiError,
   paginated,
@@ -10,6 +11,7 @@ import {
   requireAdmin,
 } from "@/lib/api/guards";
 import { slugify } from "@/lib/utils";
+import type { Product } from "@/types";
 
 export const runtime = "nodejs";
 
@@ -39,23 +41,111 @@ const createSchema = z.object({
   meta_description: z.string().optional(),
 });
 
-/** GET /api/admin/products — all products with filters + pagination. */
+type AdminFilter = {
+  category?: string;
+  status?: string; // all | published | draft | featured
+  search?: string;
+  sort?: string;
+};
+
+function demoProducts(filter: AdminFilter, page: number, limit: number) {
+  let list = [...MOCK_PRODUCTS] as (Product & { status?: string })[];
+  if (filter.search) {
+    const s = filter.search.toLowerCase();
+    list = list.filter(
+      (p) =>
+        p.title.toLowerCase().includes(s) ||
+        p.tags?.some((t) => t.toLowerCase().includes(s))
+    );
+  }
+  if (filter.category) {
+    list = list.filter((p) => p.category_id === filter.category);
+  }
+  if (filter.status === "published") list = list.filter((p) => p.is_published);
+  if (filter.status === "draft") list = list.filter((p) => !p.is_published);
+  if (filter.status === "featured") list = list.filter((p) => p.is_featured);
+
+  switch (filter.sort) {
+    case "oldest":
+      list.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+      break;
+    case "price-desc":
+      list.sort((a, b) => b.price - a.price);
+      break;
+    case "price-asc":
+      list.sort((a, b) => a.price - b.price);
+      break;
+    case "sales":
+      list.sort((a, b) => b.total_sales - a.total_sales);
+      break;
+    default:
+      list.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  }
+  return {
+    items: list.slice((page - 1) * limit, page * limit),
+    total: list.length,
+  };
+}
+
+/**
+ * GET /api/admin/products
+ * Filters: search, category (id), status (all|published|draft|featured),
+ *          sort (newest|oldest|price-desc|price-asc|sales), page, limit
+ */
 export async function GET(request: NextRequest) {
   try {
     await requireAdmin();
     const sp = request.nextUrl.searchParams;
     const { page, limit } = parsePagination(sp);
-
-    const result = await getProductsPaged({
-      categorySlug: sp.get("category") ?? undefined,
+    const filter: AdminFilter = {
+      category: sp.get("category") ?? undefined,
+      status: sp.get("status") ?? undefined,
       search: sp.get("search") ?? undefined,
-      sort: (sp.get("sort") as "newest" | "popular") ?? "newest",
-      page,
-      limit,
-    });
+      sort: sp.get("sort") ?? "newest",
+    };
 
-    // Admin view includes unpublished products too when Supabase is live
-    return NextResponse.json(paginated(result.items, result.total, page, limit));
+    if (!isSupabaseConfigured()) {
+      const { items, total } = demoProducts(filter, page, limit);
+      return NextResponse.json(paginated(items, total, page, limit));
+    }
+
+    const supabase = createAdminClient();
+    let req = supabase
+      .from("products")
+      .select("*, category:categories(*)", { count: "exact" });
+
+    if (filter.search) {
+      req = req.or(`title.ilike.%${filter.search}%,tags.cs.{${filter.search.toLowerCase()}}`);
+    }
+    if (filter.category) req = req.eq("category_id", filter.category);
+    if (filter.status === "published") req = req.eq("is_published", true);
+    if (filter.status === "draft") req = req.eq("is_published", false);
+    if (filter.status === "featured") req = req.eq("is_featured", true);
+
+    switch (filter.sort) {
+      case "oldest":
+        req = req.order("created_at", { ascending: true });
+        break;
+      case "price-desc":
+        req = req.order("price", { ascending: false });
+        break;
+      case "price-asc":
+        req = req.order("price", { ascending: true });
+        break;
+      case "sales":
+        req = req.order("total_sales", { ascending: false });
+        break;
+      default:
+        req = req.order("created_at", { ascending: false });
+    }
+
+    const { data, error, count } = await req.range(
+      (page - 1) * limit,
+      page * limit - 1
+    );
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+    return NextResponse.json(paginated(data ?? [], count ?? 0, page, limit));
   } catch (err) {
     return apiError(err);
   }
@@ -77,7 +167,6 @@ export async function POST(request: NextRequest) {
     const supabase = createAdminClient();
     let slug = data.slug ?? slugify(data.title);
 
-    // Ensure slug uniqueness
     for (let i = 0; i < 5; i++) {
       const { data: existing } = await supabase
         .from("products")
