@@ -66,7 +66,7 @@ const SECTIONS: {
   {
     title: "Content",
     links: [
-      { label: "Blog Posts", href: "/admin/blog-posts", icon: FileText },
+      { label: "Blog Posts", href: "/admin/blog", icon: FileText },
       { label: "Learning Hub", href: "/admin/learning-hub", icon: BookOpen },
     ],
   },
