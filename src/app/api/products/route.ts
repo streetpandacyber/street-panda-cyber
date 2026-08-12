@@ -9,6 +9,7 @@ import {
 } from "@/lib/api/guards";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 const fetchPage = cache(async (query: PagedQuery, page: number, limit: number) =>
   getProductsPaged({ ...query, page, limit })

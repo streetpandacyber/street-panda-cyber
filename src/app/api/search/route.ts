@@ -3,6 +3,7 @@ import { searchProducts } from "@/lib/data/service";
 import { apiError, PUBLIC_CACHE_HEADERS } from "@/lib/api/guards";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 /**
  * GET /api/search?q=term
