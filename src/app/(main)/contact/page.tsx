@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Mail, MapPin, MessageCircle } from "lucide-react";
+import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import { FacebookIcon } from "@/components/layout/SocialIcons";
 import { ContactForm } from "@/components/contact/ContactForm";
 
 export const metadata: Metadata = {
@@ -84,6 +85,17 @@ export default function ContactPage() {
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50">
+                    <Phone className="h-5 w-5 text-orange-500" />
+                  </span>
+                  <div>
+                    <p className="font-semibold text-navy-800">Call Us</p>
+                    <a href="tel:0745198099" className="text-gray-500 hover:text-orange-600">
+                      0745 198 099 — Mon–Sat, 8am–6pm EAT
+                    </a>
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
                   <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-navy-50">
                     <MapPin className="h-5 w-5 text-navy-600" />
                   </span>
@@ -94,11 +106,18 @@ export default function ContactPage() {
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-50">
-                    <MessageCircle className="h-5 w-5 text-violet-500" />
+                    <FacebookIcon className="h-5 w-5 text-violet-500" />
                   </span>
                   <div>
-                    <p className="font-semibold text-navy-800">Socials</p>
-                    <p className="text-gray-500">@jmmajiwa everywhere</p>
+                    <p className="font-semibold text-navy-800">Facebook</p>
+                    <a
+                      href="https://facebook.com/jmmajiwa"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-500 hover:text-orange-600"
+                    >
+                      @JM Majiwa — follow &amp; message us
+                    </a>
                   </div>
                 </li>
               </ul>

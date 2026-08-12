@@ -116,6 +116,15 @@ export function Footer() {
               <li className="flex items-start gap-2.5">
                 <Phone className="mt-0.5 h-4 w-4 shrink-0 text-orange-400" />
                 <a
+                  href="tel:0745198099"
+                  className="transition-colors hover:text-orange-400"
+                >
+                  0745 198 099 (Call)
+                </a>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <Phone className="mt-0.5 h-4 w-4 shrink-0 text-neon-400" />
+                <a
                   href="https://wa.me/254745198099"
                   target="_blank"
                   rel="noopener noreferrer"

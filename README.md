@@ -170,6 +170,13 @@ switch every page to live Supabase data automatically.
 3. Expose your callback URL over HTTPS (Vercel domain works perfectly).
 4. Switch `MPESA_ENVIRONMENT=production` with production credentials when ready.
 
+## 💬 Support
+
+- 📧 Email: streetpandacyber@gmail.com
+- 💬 WhatsApp: +254 745 198 099
+- 📞 Call: 0745 198 099
+- 👍 Facebook: @JM Majiwa
+
 ## 🤝 Contributing
 
 We love contributions! To get started:
