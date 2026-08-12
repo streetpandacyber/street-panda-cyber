@@ -17,10 +17,17 @@ const couponSchema = z.object({
   expires_at: z.string().optional(),
 });
 
+const DEMO_COUPONS = [
+  { id: "c1", code: "WELCOME20", description: "Welcome offer", discount_type: "percentage", discount_value: 20, minimum_order: 0, maximum_discount: 1000, usage_limit: 5000, usage_count: 1284, is_active: true, expires_at: null, created_at: "2026-01-01T00:00:00Z" },
+  { id: "c2", code: "NEWUSER", description: "New customer gift", discount_type: "fixed", discount_value: 100, minimum_order: 500, maximum_discount: null, usage_limit: 3000, usage_count: 862, is_active: true, expires_at: "2026-12-31T00:00:00Z", created_at: "2026-01-01T00:00:00Z" },
+  { id: "c3", code: "STUDENT15", description: "Student discount", discount_type: "percentage", discount_value: 15, minimum_order: 1000, maximum_discount: null, usage_limit: null, usage_count: 214, is_active: false, expires_at: "2026-06-30T00:00:00Z", created_at: "2026-02-01T00:00:00Z" },
+];
+
 /** GET /api/admin/coupons — list all coupons. */
 export async function GET() {
   try {
-    await requireAdmin();
+    const { demo } = await requireAdmin();
+    if (demo) return NextResponse.json({ data: DEMO_COUPONS });
     const supabase = createAdminClient();
     const { data, error } = await supabase
       .from("coupons")
@@ -36,8 +43,11 @@ export async function GET() {
 /** POST /api/admin/coupons — create a coupon. */
 export async function POST(request: NextRequest) {
   try {
-    await requireAdmin();
+    const { demo } = await requireAdmin();
     const parsed = couponSchema.safeParse(await request.json());
+    if (demo && parsed.success) {
+      return NextResponse.json({ data: { id: "demo", ...parsed.data } }, { status: 201 });
+    }
     if (!parsed.success) {
       return NextResponse.json(
         { error: "Invalid coupon payload", details: parsed.error.flatten() },
@@ -66,7 +76,8 @@ export async function POST(request: NextRequest) {
 /** PUT /api/admin/coupons?id=… — update a coupon. */
 export async function PUT(request: NextRequest) {
   try {
-    await requireAdmin();
+    const { demo } = await requireAdmin();
+    if (demo) return NextResponse.json({ data: { id: "demo" } });
     const id = request.nextUrl.searchParams.get("id");
     if (!id) return NextResponse.json({ error: "id is required" }, { status: 400 });
 
@@ -92,7 +103,8 @@ export async function PUT(request: NextRequest) {
 /** DELETE /api/admin/coupons?id=… — delete a coupon. */
 export async function DELETE(request: NextRequest) {
   try {
-    await requireAdmin();
+    const { demo } = await requireAdmin();
+    if (demo) return NextResponse.json({ success: true });
     const id = request.nextUrl.searchParams.get("id");
     if (!id) return NextResponse.json({ error: "id is required" }, { status: 400 });
     const supabase = createAdminClient();

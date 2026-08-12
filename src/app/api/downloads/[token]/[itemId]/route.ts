@@ -67,12 +67,18 @@ export async function GET(request: NextRequest, { params }: RouteContext) {
         if (product.file_url.startsWith("http")) {
           downloadUrl = product.file_url;
         } else {
-          const { data: signed, error: signError } = await supabase.storage
-            .from("products")
-            .createSignedUrl(product.file_url, SIGNED_URL_EXPIRY_SECONDS, {
-              download: `${(product.title ?? "download").replace(/[^\w.-]+/g, "-")}`,
-            });
-          if (!signError && signed?.signedUrl) downloadUrl = signed.signedUrl;
+          // Files live in the private "downloads" bucket (legacy: "products")
+          for (const bucket of ["downloads", "products"]) {
+            const { data: signed, error: signError } = await supabase.storage
+              .from(bucket)
+              .createSignedUrl(product.file_url, SIGNED_URL_EXPIRY_SECONDS, {
+                download: `${(product.title ?? "download").replace(/[^\w.-]+/g, "-")}`,
+              });
+            if (!signError && signed?.signedUrl) {
+              downloadUrl = signed.signedUrl;
+              break;
+            }
+          }
         }
       }
     }

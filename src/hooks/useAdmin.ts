@@ -4,13 +4,45 @@ import { useCallback, useEffect, useState } from "react";
 import type { Order, Product } from "@/types";
 
 interface AdminAnalytics {
-  revenue: { today: number; week: number; month: number; allTime: number };
-  orders_by_status: Record<string, number>;
-  top_products: { title: string; total_sales: number; revenue: number }[];
-  revenue_by_category: { category: string; revenue: number }[];
-  new_customers: { month: number; total: number };
-  downloads: { total: number; month: number };
+  range: { days: number; from: string; to: string };
+  revenue: { total: number; previous: number; changePct: number };
+  orders: {
+    total: number;
+    previous: number;
+    changePct: number;
+    byStatus: Record<string, number>;
+  };
+  customers: { total: number; new: number; previousNew: number; changePct: number };
+  downloads: { total: number; previous: number; changePct: number };
+  revenueSeries: { date: string; revenue: number }[];
+  ordersSeries: { date: string; orders: number }[];
+  customerGrowthSeries: { date: string; total: number }[];
+  topProducts: {
+    id: string;
+    title: string;
+    thumbnail_url?: string | null;
+    sales: number;
+    revenue: number;
+    rating: number;
+    views: number;
+    conversion: number;
+  }[];
+  revenueByCategory: { category: string; revenue: number }[];
+  recentOrders: {
+    id: string;
+    order_number: string;
+    customer_name: string;
+    customer_email: string;
+    items_count: number;
+    total: number;
+    status: string;
+    payment_status: string;
+    mpesa_transaction_id: string | null;
+    created_at: string;
+  }[];
 }
+
+export type { AdminAnalytics };
 
 async function getJson<T>(url: string, init?: RequestInit): Promise<T> {
   const res = await fetch(url, init);

@@ -55,15 +55,34 @@ export async function getProfile(userId: string): Promise<Profile | null> {
   return (data as Profile) ?? null;
 }
 
-/** Throws unless the request is from an authenticated admin. */
-export async function requireAdmin(): Promise<{ user: User; profile: Profile }> {
+/** Throws unless the request is from an authenticated admin.
+ *  When Supabase is not configured, returns a demo admin so the panel
+ *  remains explorable with sample data. */
+export async function requireAdmin(): Promise<{
+  user: User | null;
+  profile: Profile;
+  demo: boolean;
+}> {
   if (!isSupabaseConfigured()) {
-    throw new ApiError(503, "Supabase is not configured on this deployment");
+    return {
+      user: null,
+      demo: true,
+      profile: {
+        id: "demo",
+        email: "admin@jmmajiwa.com",
+        full_name: "Demo Admin",
+        country: "Kenya",
+        is_admin: true,
+        newsletter_subscribed: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+    };
   }
   const user = await requireUser();
   const profile = await getProfile(user.id);
   if (!profile?.is_admin) throw new ApiError(403, "Admin access required");
-  return { user, profile };
+  return { user, profile, demo: false };
 }
 
 /* ── Pagination helpers ─────────────────────────────── */

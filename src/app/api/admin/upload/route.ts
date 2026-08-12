@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { nanoid } from "nanoid";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { isSupabaseConfigured } from "@/lib/env";
 import { apiError, requireAdmin } from "@/lib/api/guards";
 
 export const runtime = "nodejs";
@@ -27,7 +28,7 @@ const FILE_TYPES = new Map([
 ]);
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5 MB
-const MAX_FILE_BYTES = 200 * 1024 * 1024; // 200 MB
+const MAX_FILE_BYTES = 500 * 1024 * 1024; // 500 MB
 
 /**
  * POST /api/admin/upload
@@ -38,6 +39,12 @@ const MAX_FILE_BYTES = 200 * 1024 * 1024; // 200 MB
 export async function POST(request: NextRequest) {
   try {
     await requireAdmin();
+    if (!isSupabaseConfigured()) {
+      return NextResponse.json(
+        { error: "Storage requires Supabase — using local preview in demo mode" },
+        { status: 503 }
+      );
+    }
 
     const form = await request.formData();
     const file = form.get("file");
@@ -65,7 +72,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const bucket = isImage ? "media" : "products";
+    const bucket = isImage ? "media" : "downloads";
     const safeName = `${Date.now()}-${nanoid(8)}${ext}`;
     const path = isImage ? `uploads/${safeName}` : `files/${safeName}`;
 
