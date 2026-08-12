@@ -9,7 +9,6 @@ import {
   FileText,
   Lock,
   ShieldCheck,
-  Star,
   Zap,
 } from "lucide-react";
 import {
@@ -28,7 +27,8 @@ export async function generateStaticParams() {
     return [];
   }
 }
-import { MOCK_REVIEWS, productRatingBreakdown } from "@/lib/data/mock";
+import { MOCK_REVIEWS } from "@/lib/data/mock";
+import { ProductReviews } from "@/components/product/ProductReviews";
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { ProductActions } from "@/components/product/ProductActions";
 import { FaqAccordion } from "@/components/product/FaqAccordion";
@@ -89,7 +89,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const related = await getRelatedProducts(product);
   const ownReviews = MOCK_REVIEWS.filter((r) => r.product_id === product.id);
   const reviews = (ownReviews.length > 0 ? ownReviews : MOCK_REVIEWS).slice(0, 3);
-  const breakdown = productRatingBreakdown(product.review_count ?? 0);
 
   const onSale =
     product.sale_price !== undefined && product.sale_price < product.price;
@@ -320,88 +319,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
         </div>
 
         {/* Reviews */}
-        <div className="mt-16">
-          <h2 className="text-2xl font-bold text-navy-800">Customer Reviews</h2>
-          <div className="mt-6 grid gap-8 lg:grid-cols-[300px_1fr]">
-            {/* Breakdown */}
-            <div className="card-premium h-fit p-6">
-              <div className="flex items-end gap-2">
-                <span className="text-5xl font-extrabold text-navy-800">
-                  {product.average_rating?.toFixed(1) ?? "4.8"}
-                </span>
-                <div className="pb-1.5">
-                  <StarRating rating={product.average_rating ?? 4.8} />
-                  <p className="mt-1 text-xs text-gray-500">
-                    {product.review_count ?? 0} verified reviews
-                  </p>
-                </div>
-              </div>
-              <div className="mt-5 space-y-2">
-                {breakdown.map((row) => {
-                  const pct =
-                    product.review_count && product.review_count > 0
-                      ? Math.round((row.count / product.review_count) * 100)
-                      : 0;
-                  return (
-                    <div key={row.stars} className="flex items-center gap-2 text-xs">
-                      <span className="flex w-8 items-center gap-0.5 font-semibold text-navy-800">
-                        {row.stars} <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                      </span>
-                      <div className="h-2 flex-1 overflow-hidden rounded-full bg-gray-100">
-                        <div
-                          className="h-full rounded-full bg-yellow-400"
-                          style={{ width: `${pct}%` }}
-                        />
-                      </div>
-                      <span className="w-8 text-right text-gray-500">{row.count}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Review list */}
-            <div className="space-y-4">
-              {reviews.map((review) => (
-                <div key={review.id} className="card-premium p-6">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-navy-600 text-sm font-bold text-white">
-                        {(review.profile?.full_name ?? "Customer")
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")
-                          .slice(0, 2)}
-                      </span>
-                      <div>
-                        <p className="text-sm font-bold text-navy-800">
-                          {review.profile?.full_name ?? "Verified Customer"}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {formatDate(review.created_at)}
-                        </p>
-                      </div>
-                    </div>
-                    {review.is_verified && (
-                      <span className="badge-neon">✓ Verified Purchase</span>
-                    )}
-                  </div>
-                  <div className="mt-3">
-                    <StarRating rating={review.rating} />
-                  </div>
-                  {review.title && (
-                    <h4 className="mt-2 font-bold text-navy-800">{review.title}</h4>
-                  )}
-                  {review.comment && (
-                    <p className="mt-1.5 text-sm leading-relaxed text-gray-600">
-                      {review.comment}
-                    </p>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        <ProductReviews
+          productId={product.id}
+          reviews={reviews}
+          averageRating={product.average_rating ?? 4.8}
+          reviewCount={product.review_count ?? reviews.length}
+        />
 
         {/* Related */}
         {related.length > 0 && (
