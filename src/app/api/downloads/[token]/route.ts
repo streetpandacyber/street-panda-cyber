@@ -23,7 +23,9 @@ export async function GET(_request: NextRequest, { params }: RouteContext) {
     const supabase = createAdminClient();
     const { data: order, error } = await supabase
       .from("orders")
-      .select("id, order_number, payment_status, download_expires_at, order_items(*)")
+      .select(
+        "id, order_number, customer_name, created_at, payment_status, download_expires_at, order_items(*, product:products(title, thumbnail_url, file_format, file_size))"
+      )
       .eq("download_token", params.token)
       .single();
 
@@ -41,6 +43,8 @@ export async function GET(_request: NextRequest, { params }: RouteContext) {
     return NextResponse.json({
       data: {
         order_number: order.order_number,
+        customer_name: order.customer_name,
+        order_date: order.created_at,
         expires_at: order.download_expires_at,
         items: (order.order_items ?? []).map(
           (i: {
@@ -49,6 +53,12 @@ export async function GET(_request: NextRequest, { params }: RouteContext) {
             product_id: string | null;
             download_count: number;
             max_downloads: number;
+            product?: {
+              title?: string;
+              thumbnail_url?: string;
+              file_format?: string;
+              file_size?: string;
+            } | null;
           }) => ({
             id: i.id,
             title: i.title,
@@ -56,6 +66,7 @@ export async function GET(_request: NextRequest, { params }: RouteContext) {
             downloads_used: i.download_count,
             downloads_remaining: Math.max(0, i.max_downloads - i.download_count),
             url: `/api/downloads/${params.token}/${i.id}`,
+            product: i.product ?? null,
           })
         ),
       },
