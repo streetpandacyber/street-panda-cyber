@@ -2,13 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isSupabaseConfigured } from "@/lib/env";
+import { apiError } from "@/lib/api/guards";
 
 export const runtime = "nodejs";
 
-const schema = z.object({
-  code: z.string().min(2),
-  subtotal: z.number().nonnegative().default(0),
-});
+const schema = z
+  .object({
+    code: z.string().min(2),
+    cartTotal: z.number().nonnegative().optional(),
+    subtotal: z.number().nonnegative().optional(),
+  })
+  .transform((v) => ({
+    code: v.code,
+    cartTotal: v.cartTotal ?? v.subtotal ?? 0,
+  }));
 
 /** Demo coupons used when the database is not configured yet. */
 const DEMO_COUPONS = [
@@ -18,13 +25,21 @@ const DEMO_COUPONS = [
     discount_value: 20,
     minimum_order: 0,
     maximum_discount: 1000,
+    usage_limit: null as number | null,
+    usage_count: 0,
+    expires_at: null as string | null,
+    is_active: true,
   },
   {
     code: "NEWUSER",
     discount_type: "fixed" as const,
     discount_value: 100,
     minimum_order: 500,
-    maximum_discount: undefined as number | undefined,
+    maximum_discount: null as number | null,
+    usage_limit: null as number | null,
+    usage_count: 0,
+    expires_at: null as string | null,
+    is_active: true,
   },
 ];
 
@@ -33,21 +48,15 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const parsed = schema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+      return NextResponse.json(
+        { valid: false, error: "Invalid request — provide code and cartTotal" },
+        { status: 400 }
+      );
     }
     const code = parsed.data.code.toUpperCase();
-    const subtotal = parsed.data.subtotal;
+    const cartTotal = parsed.data.cartTotal;
 
-    let coupon: {
-      code: string;
-      discount_type: "percentage" | "fixed";
-      discount_value: number;
-      minimum_order: number;
-      maximum_discount?: number;
-      usage_limit?: number;
-      usage_count?: number;
-      expires_at?: string;
-    } | null = null;
+    let coupon: (typeof DEMO_COUPONS)[number] | null = null;
 
     if (isSupabaseConfigured()) {
       const supabase = createAdminClient();
@@ -55,7 +64,6 @@ export async function POST(request: NextRequest) {
         .from("coupons")
         .select("*")
         .eq("code", code)
-        .eq("is_active", true)
         .single();
       coupon = data;
     } else {
@@ -68,26 +76,29 @@ export async function POST(request: NextRequest) {
         { status: 404 }
       );
     }
-
+    if (!coupon.is_active) {
+      return NextResponse.json(
+        { valid: false, error: "This coupon is not active" },
+        { status: 400 }
+      );
+    }
     if (coupon.expires_at && new Date(coupon.expires_at) < new Date()) {
       return NextResponse.json(
         { valid: false, error: "This coupon has expired" },
         { status: 400 }
       );
     }
-
     if (
-      coupon.usage_limit !== undefined &&
       coupon.usage_limit !== null &&
-      (coupon.usage_count ?? 0) >= coupon.usage_limit
+      coupon.usage_limit !== undefined &&
+      coupon.usage_count >= coupon.usage_limit
     ) {
       return NextResponse.json(
         { valid: false, error: "This coupon has reached its usage limit" },
         { status: 400 }
       );
     }
-
-    if (subtotal < (coupon.minimum_order ?? 0)) {
+    if (cartTotal < (coupon.minimum_order ?? 0)) {
       return NextResponse.json(
         {
           valid: false,
@@ -97,27 +108,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let discount =
+    let amount =
       coupon.discount_type === "percentage"
-        ? Math.round((subtotal * coupon.discount_value) / 100)
+        ? Math.round((cartTotal * coupon.discount_value) / 100)
         : coupon.discount_value;
-    if (coupon.maximum_discount) {
-      discount = Math.min(discount, coupon.maximum_discount);
-    }
-    discount = Math.min(discount, subtotal);
+    if (coupon.maximum_discount) amount = Math.min(amount, coupon.maximum_discount);
+    amount = Math.min(amount, cartTotal);
 
     return NextResponse.json({
       valid: true,
       code: coupon.code,
-      discount,
+      discountType: coupon.discount_type,
+      discountValue: coupon.discount_value,
+      discountAmount: amount,
+      // backwards-compatible aliases used by the existing cart UI
+      discount: amount,
       discount_type: coupon.discount_type,
-      message: `Coupon applied — you save KES ${discount}`,
+      message: `Coupon applied — you save KES ${amount}`,
     });
   } catch (err) {
-    console.error("[coupons:validate] error", err);
-    return NextResponse.json(
-      { error: "Could not validate coupon" },
-      { status: 500 }
-    );
+    return apiError(err);
   }
 }

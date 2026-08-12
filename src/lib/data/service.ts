@@ -209,3 +209,138 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
   });
   return db ?? MOCK_POSTS.find((p) => p.slug === slug) ?? null;
 }
+
+/* ───────────── Extended queries for the backend API ───────────── */
+
+export interface PagedQuery extends ProductQuery {
+  minPrice?: number;
+  maxPrice?: number;
+  tags?: string[];
+  featured?: boolean;
+  page?: number;
+}
+
+export interface Paged<T> {
+  items: T[];
+  total: number;
+}
+
+function applyDemoFilters(products: Product[], q: PagedQuery): Product[] {
+  let list = [...products];
+  if (q.categorySlug) {
+    const cat = MOCK_CATEGORIES.find((c) => c.slug === q.categorySlug);
+    list = list.filter((p) => p.category_id === cat?.id);
+  }
+  if (q.search) {
+    const s = q.search.toLowerCase();
+    list = list.filter(
+      (p) =>
+        p.title.toLowerCase().includes(s) ||
+        p.description?.toLowerCase().includes(s) ||
+        p.tags?.some((t) => t.toLowerCase().includes(s))
+    );
+  }
+  if (q.minPrice !== undefined)
+    list = list.filter((p) => (p.sale_price ?? p.price) >= (q.minPrice ?? 0));
+  if (q.maxPrice !== undefined)
+    list = list.filter((p) => (p.sale_price ?? p.price) <= (q.maxPrice ?? Infinity));
+  if (q.tags?.length)
+    list = list.filter((p) => q.tags!.every((t) => p.tags?.includes(t)));
+  if (q.featured) list = list.filter((p) => p.is_featured);
+  return list;
+}
+
+export async function getProductsPaged(q: PagedQuery = {}): Promise<Paged<Product>> {
+  const db = await trySupabase(async (db) => {
+    let req = db
+      .from("products")
+      .select("*, category:categories(*)", { count: "exact" })
+      .eq("is_published", true);
+
+    if (q.categorySlug) {
+      const { data: cat } = await db
+        .from("categories")
+        .select("id")
+        .eq("slug", q.categorySlug)
+        .single();
+      if (!cat) return { items: [], total: 0 };
+      req = req.eq("category_id", cat.id);
+    }
+    if (q.search) req = req.ilike("title", `%${q.search}%`);
+    if (q.minPrice !== undefined) req = req.gte("price", q.minPrice);
+    if (q.maxPrice !== undefined) req = req.lte("price", q.maxPrice);
+    if (q.tags?.length) req = req.contains("tags", q.tags);
+    if (q.featured) req = req.eq("is_featured", true);
+
+    switch (q.sort) {
+      case "popular": req = req.order("total_sales", { ascending: false }); break;
+      case "rating": req = req.order("average_rating", { ascending: false }); break;
+      case "price-asc": req = req.order("price", { ascending: true }); break;
+      case "price-desc": req = req.order("price", { ascending: false }); break;
+      default: req = req.order("created_at", { ascending: false });
+    }
+
+    const page = q.page ?? 1;
+    const limit = q.limit ?? 12;
+    req = req.range((page - 1) * limit, page * limit - 1);
+
+    const { data, error, count } = await req;
+    if (error) return null;
+    return { items: (data as unknown as Product[]) ?? [], total: count ?? 0 };
+  });
+
+  if (db) return db;
+
+  const filtered = applyDemoFilters(MOCK_PRODUCTS, q);
+  const page = q.page ?? 1;
+  const limit = q.limit ?? 12;
+  return {
+    items: filtered.slice((page - 1) * limit, page * limit),
+    total: filtered.length,
+  };
+}
+
+export async function getCategoriesWithCounts(): Promise<
+  (Category & { product_count: number })[]
+> {
+  const db = await trySupabase(async (db) => {
+    const [cats, counts] = await Promise.all([
+      db.from("categories").select("*").order("sort_order", { ascending: true }),
+      db.from("products").select("category_id", { count: "exact", head: false }),
+    ]);
+    if (cats.error || !cats.data?.length) return null;
+    const byCat = new Map<string, number>();
+    for (const row of counts.data ?? []) {
+      const id = (row as { category_id: string | null }).category_id;
+      if (id) byCat.set(id, (byCat.get(id) ?? 0) + 1);
+    }
+    return (cats.data as Category[]).map((c) => ({
+      ...c,
+      product_count: byCat.get(c.id) ?? 0,
+    }));
+  });
+
+  if (db) return db;
+
+  return MOCK_CATEGORIES.map((c) => ({
+    ...c,
+    product_count: MOCK_PRODUCTS.filter((p) => p.category_id === c.id).length,
+  }));
+}
+
+export async function searchProducts(q: string, limit = 10): Promise<Product[]> {
+  if (!q.trim()) return [];
+  const db = await trySupabase(async (db) => {
+    const { data, error } = await db
+      .from("products")
+      .select("*, category:categories(*)")
+      .eq("is_published", true)
+      .or(`title.ilike.%${q}%,description.ilike.%${q}%,tags.cs.{${q.toLowerCase()}}`)
+      .order("total_sales", { ascending: false })
+      .limit(limit);
+    if (error || !data?.length) return null;
+    return data as unknown as Product[];
+  });
+  if (db) return db;
+  return applyDemoFilters(MOCK_PRODUCTS, { search: q }).slice(0, limit);
+}

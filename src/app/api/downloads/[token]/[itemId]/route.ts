@@ -1,33 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getAuthUser } from "@/lib/api/guards";
 import { isSupabaseConfigured } from "@/lib/env";
+import { apiError, ApiError } from "@/lib/api/guards";
 
 export const runtime = "nodejs";
+
+const SIGNED_URL_EXPIRY_SECONDS = 60 * 60; // 1 hour
 
 interface RouteContext {
   params: { token: string; itemId: string };
 }
 
 /**
- * Secure download gateway.
- * Validates the order's download token + expiry + remaining downloads,
- * then returns a signed Supabase Storage URL (or redirects for external
- * file URLs) and increments the item's download counter.
+ * GET /api/downloads/[token]/[itemId]
+ * Validates the token/item pair, enforces the download limit, generates a
+ * 1-hour signed Supabase Storage URL, increments counters and logs the
+ * download event.
  */
-export async function GET(_request: NextRequest, { params }: RouteContext) {
-  const { token, itemId } = params;
-
-  if (!isSupabaseConfigured()) {
-    return NextResponse.json(
-      {
-        error:
-          "Downloads require a configured Supabase project. Add your environment variables.",
-      },
-      { status: 503 }
-    );
-  }
-
+export async function GET(request: NextRequest, { params }: RouteContext) {
   try {
+    if (!isSupabaseConfigured()) {
+      throw new ApiError(
+        503,
+        "Downloads require a configured Supabase project. Add your environment variables."
+      );
+    }
+
+    const { token, itemId } = params;
     const supabase = createAdminClient();
 
     const { data: order, error } = await supabase
@@ -36,38 +36,21 @@ export async function GET(_request: NextRequest, { params }: RouteContext) {
       .eq("download_token", token)
       .single();
 
-    if (error || !order) {
-      return NextResponse.json({ error: "Invalid download link" }, { status: 404 });
-    }
-
+    if (error || !order) throw new ApiError(404, "Invalid download link");
     if (order.payment_status !== "paid") {
-      return NextResponse.json({ error: "Order is not paid" }, { status: 403 });
+      throw new ApiError(403, "Order is not paid");
+    }
+    if (order.download_expires_at && new Date(order.download_expires_at) < new Date()) {
+      throw new ApiError(410, "This download link has expired. Sign in to request a new one.");
     }
 
-    if (
-      order.download_expires_at &&
-      new Date(order.download_expires_at) < new Date()
-    ) {
-      return NextResponse.json(
-        { error: "This download link has expired. Sign in to request a new one." },
-        { status: 410 }
-      );
-    }
-
-    const item = (order.order_items ?? []).find(
-      (i: { id: string }) => i.id === itemId
-    );
-    if (!item) {
-      return NextResponse.json({ error: "Item not found in this order" }, { status: 404 });
-    }
+    const item = (order.order_items ?? []).find((i: { id: string }) => i.id === itemId);
+    if (!item) throw new ApiError(404, "Item does not belong to this order");
 
     if (item.download_count >= item.max_downloads) {
-      return NextResponse.json(
-        {
-          error:
-            "Download limit reached. Contact streetpandacyber@gmail.com if you need more access.",
-        },
-        { status: 429 }
+      throw new ApiError(
+        429,
+        "Download limit reached. Contact streetpandacyber@gmail.com if you need more access."
       );
     }
 
@@ -86,24 +69,19 @@ export async function GET(_request: NextRequest, { params }: RouteContext) {
         } else {
           const { data: signed, error: signError } = await supabase.storage
             .from("products")
-            .createSignedUrl(product.file_url, 60 * 30, {
+            .createSignedUrl(product.file_url, SIGNED_URL_EXPIRY_SECONDS, {
               download: `${(product.title ?? "download").replace(/[^\w.-]+/g, "-")}`,
             });
-          if (!signError && signed?.signedUrl) {
-            downloadUrl = signed.signedUrl;
-          }
+          if (!signError && signed?.signedUrl) downloadUrl = signed.signedUrl;
         }
       }
     }
 
     if (!downloadUrl) {
-      return NextResponse.json(
-        { error: "File is not available yet. Please contact support." },
-        { status: 404 }
-      );
+      throw new ApiError(404, "File is not available yet. Please contact support.");
     }
 
-    // Increment download counters
+    // Increment counters
     await supabase
       .from("order_items")
       .update({ download_count: item.download_count + 1 })
@@ -113,17 +91,30 @@ export async function GET(_request: NextRequest, { params }: RouteContext) {
         await supabase.rpc("increment_product_downloads", {
           product_row_id: item.product_id,
         });
-      } catch (e) {
-        console.warn("[downloads] rpc", e);
+      } catch {
+        /* non-fatal */
       }
     }
 
-    return NextResponse.json({ download_url: downloadUrl });
+    // Log the download event (audit trail)
+    const user = await getAuthUser();
+    try {
+      await supabase.from("download_logs").insert({
+        order_id: order.id,
+        order_item_id: item.id,
+        user_id: user?.id ?? null,
+        ip_address: request.headers.get("x-forwarded-for")?.split(",")[0] ?? null,
+        user_agent: request.headers.get("user-agent"),
+      });
+    } catch {
+      /* migration 002 not applied yet — logging is best-effort */
+    }
+
+    return NextResponse.json({
+      download_url: downloadUrl,
+      expires_in_seconds: SIGNED_URL_EXPIRY_SECONDS,
+    });
   } catch (err) {
-    console.error("[downloads] error", err);
-    return NextResponse.json(
-      { error: "Could not generate download link" },
-      { status: 500 }
-    );
+    return apiError(err);
   }
 }

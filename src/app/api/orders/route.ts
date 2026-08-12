@@ -144,6 +144,25 @@ export async function POST(request: NextRequest) {
         .eq("id", couponId);
     }
 
+    // Optional order webhook notification (fire-and-forget)
+    const webhookUrl = process.env.ORDER_WEBHOOK_URL;
+    if (webhookUrl) {
+      fetch(webhookUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          event: "order.created",
+          order_id: order.id,
+          order_number: order.order_number,
+          total,
+          currency: "KES",
+          customer_email: data.customer_email,
+          items: data.items,
+          created_at: new Date().toISOString(),
+        }),
+      }).catch((e) => console.warn("[orders] webhook failed", e));
+    }
+
     return NextResponse.json({
       id: order.id,
       order_number: order.order_number,

@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { isSupabaseConfigured } from "@/lib/env";
+import { APP_URL, isSupabaseConfigured } from "@/lib/env";
 import { sendEmail } from "@/lib/email";
 import { NewsletterWelcome } from "../../../../emails/NewsletterWelcome";
-import { APP_URL } from "@/lib/env";
+import { apiError } from "@/lib/api/guards";
 
 export const runtime = "nodejs";
 
@@ -24,13 +24,30 @@ export async function POST(request: NextRequest) {
     }
     const email = parsed.data.email.toLowerCase().trim();
 
+    let alreadySubscribed = false;
+
     if (isSupabaseConfigured()) {
       const supabase = createAdminClient();
-      const { error } = await supabase
+
+      const { data: existing } = await supabase
         .from("newsletter_subscribers")
-        .upsert({ email, subscribed_at: new Date().toISOString() }, { onConflict: "email" });
-      if (error) {
-        console.error("[newsletter] insert failed", error);
+        .select("id, unsubscribed_at")
+        .eq("email", email)
+        .single();
+
+      if (existing && !existing.unsubscribed_at) {
+        alreadySubscribed = true;
+      } else if (existing) {
+        // previously unsubscribed — re-subscribe
+        await supabase
+          .from("newsletter_subscribers")
+          .update({ unsubscribed_at: null, subscribed_at: new Date().toISOString() })
+          .eq("id", existing.id);
+      } else {
+        const { error } = await supabase
+          .from("newsletter_subscribers")
+          .insert({ email, subscribed_at: new Date().toISOString() });
+        if (error) console.error("[newsletter] insert failed", error);
       }
     }
 
@@ -50,13 +67,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: "Subscribed successfully",
+      alreadySubscribed,
+      message: alreadySubscribed
+        ? "You're already subscribed — the free pack is in your inbox!"
+        : "Subscribed successfully — check your inbox for your free gift!",
     });
   } catch (err) {
-    console.error("[newsletter] unexpected error", err);
-    return NextResponse.json(
-      { error: "Could not subscribe. Please try again." },
-      { status: 500 }
-    );
+    return apiError(err);
   }
 }

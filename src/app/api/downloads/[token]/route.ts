@@ -1,0 +1,66 @@
+import { NextRequest, NextResponse } from "next/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { isSupabaseConfigured } from "@/lib/env";
+import { apiError, ApiError } from "@/lib/api/guards";
+
+export const runtime = "nodejs";
+
+interface RouteContext {
+  params: { token: string };
+}
+
+/**
+ * GET /api/downloads/[token]
+ * Validates the order's download token and returns the list of
+ * downloadable items (with remaining download counts).
+ */
+export async function GET(_request: NextRequest, { params }: RouteContext) {
+  try {
+    if (!isSupabaseConfigured()) {
+      throw new ApiError(503, "Supabase is not configured on this deployment");
+    }
+
+    const supabase = createAdminClient();
+    const { data: order, error } = await supabase
+      .from("orders")
+      .select("id, order_number, payment_status, download_expires_at, order_items(*)")
+      .eq("download_token", params.token)
+      .single();
+
+    if (error || !order) throw new ApiError(404, "Invalid download link");
+    if (order.payment_status !== "paid") {
+      throw new ApiError(403, "This order has not been paid for");
+    }
+    if (
+      order.download_expires_at &&
+      new Date(order.download_expires_at) < new Date()
+    ) {
+      throw new ApiError(410, "This download link has expired");
+    }
+
+    return NextResponse.json({
+      data: {
+        order_number: order.order_number,
+        expires_at: order.download_expires_at,
+        items: (order.order_items ?? []).map(
+          (i: {
+            id: string;
+            title: string;
+            product_id: string | null;
+            download_count: number;
+            max_downloads: number;
+          }) => ({
+            id: i.id,
+            title: i.title,
+            product_id: i.product_id,
+            downloads_used: i.download_count,
+            downloads_remaining: Math.max(0, i.max_downloads - i.download_count),
+            url: `/api/downloads/${params.token}/${i.id}`,
+          })
+        ),
+      },
+    });
+  } catch (err) {
+    return apiError(err);
+  }
+}
