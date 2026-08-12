@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import type { Order } from "@/types";
-import { createClient } from "@/lib/supabase/client";
+import { useAdmin } from "@/hooks/useAdmin";
 import { isSupabaseConfigured } from "@/lib/env";
 import { formatDate, formatPrice } from "@/lib/utils";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
@@ -81,51 +81,43 @@ const DEMO_ORDERS: Partial<Order>[] = [
 
 export default function AdminDashboard() {
   const configured = isSupabaseConfigured();
-  const [stats, setStats] = useState({
-    revenueToday: 21400,
-    totalOrders: 1284,
-    totalCustomers: 946,
-    totalProducts: 128,
-  });
+  const { analytics } = useAdmin();
   const [orders, setOrders] = useState<Partial<Order>[]>(DEMO_ORDERS);
+  const [productCount, setProductCount] = useState(128);
   const revenue = DEMO_REVENUE;
 
+  // Recent orders & product count come from the admin API when Supabase is live
   useEffect(() => {
     if (!configured) return;
-    const supabase = createClient();
     (async () => {
       try {
-        const [ordersRes, customersRes, productsRes] = await Promise.all([
-          supabase
-            .from("orders")
-            .select("*")
-            .order("created_at", { ascending: false })
-            .limit(20),
-          supabase.from("profiles").select("id", { count: "exact", head: true }),
-          supabase.from("products").select("id", { count: "exact", head: true }),
+        const [ordersRes, productsRes] = await Promise.all([
+          fetch("/api/admin/orders?limit=6"),
+          fetch("/api/admin/products?limit=1"),
         ]);
-        const liveOrders = (ordersRes.data ?? []) as unknown as Order[];
-        if (liveOrders.length > 0) {
-          const today = new Date().toDateString();
-          setStats({
-            revenueToday: liveOrders
-              .filter(
-                (o) =>
-                  o.payment_status === "paid" &&
-                  new Date(o.created_at).toDateString() === today
-              )
-              .reduce((sum, o) => sum + o.total, 0),
-            totalOrders: liveOrders.length,
-            totalCustomers: customersRes.count ?? 0,
-            totalProducts: productsRes.count ?? 0,
-          });
-          setOrders(liveOrders.slice(0, 6));
+        const ordersData = await ordersRes.json().catch(() => null);
+        const productsData = await productsRes.json().catch(() => null);
+        if (ordersRes.ok && ordersData?.data?.length) {
+          setOrders(ordersData.data.slice(0, 6));
+        }
+        if (productsRes.ok && productsData?.pagination?.total) {
+          setProductCount(productsData.pagination.total);
         }
       } catch {
         /* keep demo data */
       }
     })();
   }, [configured]);
+
+  const stats = {
+    revenueToday: analytics?.revenue.today ?? 21400,
+    totalOrders:
+      analytics && Object.values(analytics.orders_by_status).length
+        ? Object.values(analytics.orders_by_status).reduce((a, b) => a + b, 0)
+        : 1284,
+    totalCustomers: analytics?.new_customers.total ?? 946,
+    totalProducts: productCount,
+  };
 
   const statCards = [
     {

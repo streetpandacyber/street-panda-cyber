@@ -3,6 +3,12 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import { useMemo } from "react";
+import type { Category } from "@/types";
+
+interface FeaturedCategoriesProps {
+  categories?: (Category & { product_count?: number })[];
+}
 
 const CATEGORIES = [
   {
@@ -71,7 +77,17 @@ const CATEGORIES = [
   },
 ];
 
-export function FeaturedCategories() {
+export function FeaturedCategories({ categories }: FeaturedCategoriesProps) {
+  const cats = useMemo(() => {
+    if (!categories?.length) return CATEGORIES;
+    return CATEGORIES.map((c) => {
+      const live = categories.find((lc) => lc.slug === c.slug);
+      if (!live) return c;
+      const n = live.product_count ?? 0;
+      return { ...c, count: `${n} product${n === 1 ? "" : "s"}` };
+    });
+  }, [categories]);
+
   return (
     <section className="section-padding bg-white">
       <div className="container-custom">
@@ -99,7 +115,7 @@ export function FeaturedCategories() {
           transition={{ staggerChildren: 0.07 }}
           className="mt-14 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4"
         >
-          {CATEGORIES.map((cat, i) => (
+          {cats.map((cat, i) => (
             <motion.div
               key={cat.name}
               initial={{ opacity: 0, y: 24 }}

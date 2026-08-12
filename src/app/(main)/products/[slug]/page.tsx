@@ -14,8 +14,20 @@ import {
 } from "lucide-react";
 import {
   getProductBySlug,
+  getProducts,
   getRelatedProducts,
 } from "@/lib/data/service";
+
+export const revalidate = 3600; // ISR: regenerate product pages hourly
+
+export async function generateStaticParams() {
+  try {
+    const products = await getProducts({});
+    return products.map((p) => ({ slug: p.slug }));
+  } catch {
+    return [];
+  }
+}
 import { MOCK_REVIEWS, productRatingBreakdown } from "@/lib/data/mock";
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { ProductActions } from "@/components/product/ProductActions";

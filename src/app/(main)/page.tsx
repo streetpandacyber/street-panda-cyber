@@ -1,4 +1,4 @@
-import { getBlogPosts, getBundles } from "@/lib/data/service";
+import { getBlogPosts, getBundles, getCategoriesWithCounts } from "@/lib/data/service";
 import { HeroSection } from "@/components/home/HeroSection";
 import { FeaturedCategories } from "@/components/home/FeaturedCategories";
 import { BestSellers } from "@/components/home/BestSellers";
@@ -13,12 +13,16 @@ import { NewsletterSection } from "@/components/home/NewsletterSection";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [bundles, posts] = await Promise.all([getBundles(), getBlogPosts()]);
+  const [bundles, posts, categories] = await Promise.all([
+    getBundles(),
+    getBlogPosts(),
+    getCategoriesWithCounts(),
+  ]);
 
   return (
     <>
       <HeroSection />
-      <FeaturedCategories />
+      <FeaturedCategories categories={categories} />
       <BestSellers />
       <HowItWorks />
       <FeaturedBundles bundles={bundles} />
