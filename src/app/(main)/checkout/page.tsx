@@ -501,18 +501,39 @@ export default function CheckoutPage() {
 
               {isDemo && step === 2 && (
                 <div className="mt-4 rounded-2xl border border-orange-200 bg-orange-50 p-4 text-sm text-orange-800">
-                  <p className="font-bold">🧪 Demo mode active</p>
-                  <p className="mt-1">
-                    Supabase &amp; M-Pesa credentials are not configured, so no
-                    real payment can run. Add env vars for live payments — or
-                    preview the success experience:
-                  </p>
-                  <button
-                    onClick={simulateDemoSuccess}
-                    className="btn-primary mt-3 !py-2.5 text-sm"
-                  >
-                    Simulate Payment Success
-                  </button>
+                  {process.env.NODE_ENV !== "production" ? (
+                    <>
+                      <p className="font-bold">🧪 Demo mode active</p>
+                      <p className="mt-1">
+                        Supabase &amp; M-Pesa credentials are not configured, so no
+                        real payment can run. Add env vars for live payments — or
+                        preview the success experience:
+                      </p>
+                      <button
+                        onClick={simulateDemoSuccess}
+                        className="btn-primary mt-3 !py-2.5 text-sm"
+                      >
+                        Simulate Payment Success
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <p className="font-bold">📲 M-Pesa is being activated</p>
+                      <p className="mt-1">
+                        Live payments are switching on shortly. Want this order
+                        right now? Send us your cart on WhatsApp and we&apos;ll
+                        complete it manually with instant delivery.
+                      </p>
+                      <a
+                        href="https://wa.me/254745198099"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn-primary mt-3 !py-2.5 text-sm"
+                      >
+                        Order via WhatsApp
+                      </a>
+                    </>
+                  )}
                 </div>
               )}
 
