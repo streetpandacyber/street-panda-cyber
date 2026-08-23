@@ -80,7 +80,9 @@ npm run dev
 ```
 
 The site works **out of the box with demo data** — add real credentials to
-switch every page to live Supabase data automatically.
+switch every page to live Supabase data automatically. The demo admin panel is
+opt-in for local development only: set `ALLOW_DEMO_ADMIN=true` locally and
+keep it `false` in production.
 
 ### Scripts
 
@@ -91,6 +93,8 @@ switch every page to live Supabase data automatically.
 | `npm run start`       | Serve the production build            |
 | `npm run lint`        | ESLint                                |
 | `npm run type-check`  | TypeScript type checking              |
+| `npm run test`        | Vitest unit tests                     |
+| `npm run audit:prod`  | Production dependency audit           |
 | `npm run format`      | Prettier (write)                      |
 | `npm run format:check`| Prettier (check)                      |
 | `npm run db:push`     | Push the SQL migration to Supabase    |
@@ -114,6 +118,8 @@ switch every page to live Supabase data automatically.
 | `NEXT_PUBLIC_APP_URL` | Canonical app URL (used in sitemap/OG/emails) |
 | `NEXT_PUBLIC_APP_NAME` / `NEXT_PUBLIC_APP_DESCRIPTION` | Branding used in metadata |
 | `ADMIN_EMAIL` | Primary admin contact |
+| `ALLOW_DEMO_ADMIN` | Local-only demo admin switch; must remain `false` in production |
+| `ORDER_WEBHOOK_URL` | Optional server-side order-created notification webhook |
 
 ## 📁 Folder Structure
 
@@ -147,6 +153,12 @@ switch every page to live Supabase data automatically.
     └── middleware.ts           # session refresh + route protection
 ```
 
+## ✅ CI and merge safety
+
+Every pull request and push to `main` runs `.github/workflows/ci.yml`, which installs the lockfile dependencies and executes linting, TypeScript checks, unit tests, a production build, and a production dependency audit. Keep `main` protected in GitHub and require the `Lint, type-check, test, build, and audit` check before merging.
+
+Do not merge unreviewed changes that add binaries, archives, payment logic, authentication changes, or production credentials. Use a focused branch and pull request for dependency upgrades or database migrations.
+
 ## ☁️ Deployment
 
 ### Vercel (recommended)
@@ -154,7 +166,7 @@ switch every page to live Supabase data automatically.
 1. Push this repository to GitHub and import it in Vercel.
 2. Add every variable from `.env.example` in **Project → Settings → Environment Variables**.
 3. Set `MPESA_CALLBACK_URL` to `https://<your-domain>/api/mpesa/callback`.
-4. Deploy — the CI pipeline verifies lint, types and build first.
+4. Deploy — the GitHub Actions CI pipeline verifies lint, types, tests, build and production dependencies before merge.
 
 ### Supabase setup checklist
 

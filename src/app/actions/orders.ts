@@ -33,7 +33,7 @@ export async function createOrderAction(
   // Attach the signed-in user when present
   let userId: string | null = null;
   try {
-    const browser = createClient();
+    const browser = await createClient();
     const { data } = await browser.auth.getUser();
     userId = data.user?.id ?? null;
   } catch {
@@ -117,7 +117,7 @@ export async function cancelOrderAction(orderId: string): Promise<ActionResult> 
   // Only the owner (or unpaid orders) may cancel
   let userId: string | null = null;
   try {
-    const browser = createClient();
+    const browser = await createClient();
     const { data } = await browser.auth.getUser();
     userId = data.user?.id ?? null;
   } catch {

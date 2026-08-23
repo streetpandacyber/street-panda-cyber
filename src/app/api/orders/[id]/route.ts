@@ -5,7 +5,7 @@ import { apiError, ApiError, requireUser } from "@/lib/api/guards";
 export const runtime = "nodejs";
 
 interface RouteContext {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 /**
@@ -15,12 +15,13 @@ interface RouteContext {
 export async function GET(_request: NextRequest, { params }: RouteContext) {
   try {
     const user = await requireUser();
+    const { id } = await params;
     const supabase = createAdminClient();
 
     const { data: order, error } = await supabase
       .from("orders")
       .select("*, order_items(*), profile:profiles(full_name, is_admin)")
-      .eq("id", params.id)
+      .eq("id", id)
       .single();
 
     if (error || !order) throw new ApiError(404, "Order not found");

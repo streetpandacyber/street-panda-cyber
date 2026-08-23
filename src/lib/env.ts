@@ -16,6 +16,19 @@ export function isSupabaseConfigured(): boolean {
   );
 }
 
+export function isSupabaseAdminConfigured(): boolean {
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
+  return (
+    isSupabaseConfigured() &&
+    serviceRoleKey.length > 20 &&
+    !serviceRoleKey.startsWith("your_")
+  );
+}
+
+export function isDemoAdminAllowed(): boolean {
+  return process.env.NODE_ENV !== "production" && process.env.ALLOW_DEMO_ADMIN === "true";
+}
+
 export function isMpesaConfigured(): boolean {
   const key = process.env.MPESA_CONSUMER_KEY ?? "";
   const secret = process.env.MPESA_CONSUMER_SECRET ?? "";

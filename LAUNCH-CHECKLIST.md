@@ -1,18 +1,19 @@
 # 🚀 JM Majiwa — Launch Checklist
 
-The code is complete and verified. This checklist takes you from "repo" to
-"live store" in ~30 minutes, then to "real M-Pesa revenue" when your
-Safaricom production credentials arrive. No code changes are needed at any
-step — everything is configuration.
+The code is validated by the repository CI workflow. This checklist takes you
+from "repo" to "live store" in ~30 minutes, then to "real M-Pesa revenue" when
+your Safaricom production credentials arrive. Account and environment
+configuration still requires explicit verification.
 
 ---
 
 ## Phase 1 — Put the code on `main` (2 min)
 
-1. Open [PR #2](../../pull/2) on GitHub.
-2. Click **Merge pull request** → confirm.
+1. Open the current production-readiness pull request on GitHub.
+2. Confirm the CI quality gate passes.
+3. Review the changed files and merge only after the required review.
 
-*(That's it for code. Everything below is accounts + config.)*
+*(Database migrations and environment configuration below still require explicit verification.)*
 
 ## Phase 2 — Database (10 min, free tier)
 
@@ -26,7 +27,8 @@ step — everything is configuration.
    4. `supabase/migrations/004_avatar_uploads.sql`
    5. `supabase/migrations/005_blog_authors.sql`
    6. `supabase/migrations/006_seed_articles.sql`
-   7. `supabase/seed.sql` *(demo catalog — replace later via the admin panel)*
+   7. `supabase/migrations/007_atomic_download_claim.sql`
+   8. `supabase/seed.sql` *(demo catalog — replace later via the admin panel)*
 3. Grab your keys: **Project Settings → API**
    - `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
    - `anon public key` → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -56,7 +58,8 @@ MPESA_ENVIRONMENT=sandbox
 > Leave `MPESA_*` and `RESEND_API_KEY` **unset** for now. Payments will show
 > the "Order via WhatsApp" fallback and emails will skip gracefully.
 
-4. **Deploy**. Wait ~2 minutes.
+4. Keep `ALLOW_DEMO_ADMIN=false` in Vercel.
+5. **Deploy**. Wait ~2 minutes.
 
 **Option B — Vercel CLI from your machine:**
 
@@ -79,6 +82,7 @@ npx vercel --prod
      *"M-Pesa is being activated — Order via WhatsApp"* fallback. ✔
    - The order appears in **Supabase → orders** and in `/admin/orders`. ✔
    - `/downloads/<token>` link from the order works. ✔
+   - `ALLOW_DEMO_ADMIN` is not enabled in production. ✔
 
 ## Phase 5 — Email (optional at launch, 5 min)
 
@@ -113,7 +117,8 @@ MPESA_ENVIRONMENT=sandbox
 3. Complete one end-to-end test payment (STK prompt → PIN → success page →
    download link → order marked `paid` in `/admin`).
 4. Switch to **production** credentials + `MPESA_ENVIRONMENT=production`.
-5. Update marketing to advertise instant M-Pesa. 🎉
+5. Confirm duplicate callbacks do not issue a second token or increment sales twice.
+6. Update marketing to advertise instant M-Pesa.
 
 ## Phase 7 — Grow (anytime later)
 

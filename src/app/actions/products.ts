@@ -12,7 +12,7 @@ async function assertAdmin(): Promise<true | ActionResult> {
   if (!isSupabaseConfigured()) {
     return { error: "Supabase is not configured on this deployment." };
   }
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data } = await supabase.auth.getUser();
   if (!data.user) return { error: "Authentication required." };
   const admin = createAdminClient();

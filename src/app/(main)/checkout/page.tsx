@@ -128,8 +128,7 @@ export default function CheckoutPage() {
   const [isDemo, setIsDemo] = useState(false);
   const [downloadToken, setDownloadToken] = useState<string | null>(null);
   const [tokenItems, setTokenItems] = useState<TokenItem[]>([]);
-  const purchasedRef = useRef<CartItem[]>([]);
-
+  const [purchasedItems, setPurchasedItems] = useState<CartItem[]>([]);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const subtotal = getSubtotal();
@@ -165,7 +164,7 @@ export default function CheckoutPage() {
 
   const handlePaid = async (token: string | null, number: string) => {
     stopPolling();
-    purchasedRef.current = [...items];
+    setPurchasedItems([...items]);
     setOrderNumber(number);
     setDownloadToken(token);
     setPayState("success");
@@ -274,7 +273,7 @@ export default function CheckoutPage() {
   };
 
   const simulateDemoSuccess = () => {
-    purchasedRef.current = [...items];
+    setPurchasedItems([...items]);
     setIsDemo(true);
     setDownloadToken(null);
     setOrderNumber((n) => n || "JMM-DEMO-0001");
@@ -318,7 +317,7 @@ export default function CheckoutPage() {
   const successCards: TokenItem[] =
     tokenItems.length > 0
       ? tokenItems
-      : purchasedRef.current.map((c) => ({
+      : purchasedItems.map((c) => ({
           id: c.product.id,
           title: c.product.title,
           product_id: c.product.id,

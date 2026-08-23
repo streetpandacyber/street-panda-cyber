@@ -14,7 +14,7 @@ export async function loginAction(formData: FormData): Promise<ActionResult> {
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) return { error: error.message };
 
@@ -35,7 +35,7 @@ export async function registerAction(formData: FormData): Promise<ActionResult> 
   if (password.length < 8) return { error: "Password must be at least 8 characters." };
   if (password !== confirm) return { error: "Passwords do not match." };
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
@@ -50,7 +50,7 @@ export async function registerAction(formData: FormData): Promise<ActionResult> 
 
 export async function logoutAction(): Promise<ActionResult> {
   if (!isSupabaseConfigured()) return { error: "Not configured." };
-  const supabase = createClient();
+  const supabase = await createClient();
   await supabase.auth.signOut();
   revalidatePath("/", "layout");
   redirect("/");
@@ -63,7 +63,7 @@ export async function resetPasswordAction(
     return { error: "Authentication is not configured on this deployment." };
   }
   const email = String(formData.get("email") ?? "");
-  const supabase = createClient();
+  const supabase = await createClient();
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/login`,
   });
@@ -77,7 +77,7 @@ export async function updateProfileAction(
   if (!isSupabaseConfigured()) {
     return { error: "Authentication is not configured on this deployment." };
   }
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: userData } = await supabase.auth.getUser();
   if (!userData.user) return { error: "Not authenticated." };
 

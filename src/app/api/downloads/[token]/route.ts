@@ -6,7 +6,7 @@ import { apiError, ApiError } from "@/lib/api/guards";
 export const runtime = "nodejs";
 
 interface RouteContext {
-  params: { token: string };
+  params: Promise<{ token: string }>;
 }
 
 /**
@@ -20,13 +20,14 @@ export async function GET(_request: NextRequest, { params }: RouteContext) {
       throw new ApiError(503, "Supabase is not configured on this deployment");
     }
 
+    const { token } = await params;
     const supabase = createAdminClient();
     const { data: order, error } = await supabase
       .from("orders")
       .select(
         "id, order_number, customer_name, created_at, payment_status, download_expires_at, order_items(*, product:products(title, thumbnail_url, file_format, file_size))"
       )
-      .eq("download_token", params.token)
+      .eq("download_token", token)
       .single();
 
     if (error || !order) throw new ApiError(404, "Invalid download link");
@@ -65,7 +66,7 @@ export async function GET(_request: NextRequest, { params }: RouteContext) {
             product_id: i.product_id,
             downloads_used: i.download_count,
             downloads_remaining: Math.max(0, i.max_downloads - i.download_count),
-            url: `/api/downloads/${params.token}/${i.id}`,
+            url: `/api/downloads/${token}/${i.id}`,
             product: i.product ?? null,
           })
         ),

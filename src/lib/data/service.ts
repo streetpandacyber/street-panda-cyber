@@ -30,11 +30,11 @@ export interface ProductQuery {
 }
 
 async function trySupabase<T>(
-  fn: (db: ReturnType<typeof createClient>) => Promise<T | null>
+  fn: (db: Awaited<ReturnType<typeof createClient>>) => Promise<T | null>
 ): Promise<T | null> {
   if (!isSupabaseConfigured()) return null;
   try {
-    return await fn(createClient());
+    return await fn(await createClient());
   } catch {
     return null;
   }

@@ -8,7 +8,7 @@ import { apiError, ApiError } from "@/lib/api/guards";
 export const runtime = "nodejs";
 
 interface RouteContext {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 /**
@@ -18,7 +18,8 @@ interface RouteContext {
  */
 export async function GET(_request: NextRequest, { params }: RouteContext) {
   try {
-    const product = await getProductBySlug(params.slug);
+    const { slug } = await params;
+    const product = await getProductBySlug(slug);
     if (!product || !product.is_published) {
       throw new ApiError(404, "Product not found");
     }

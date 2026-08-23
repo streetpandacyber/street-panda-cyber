@@ -9,7 +9,7 @@ export const runtime = "nodejs";
 const SIGNED_URL_EXPIRY_SECONDS = 60 * 60; // 1 hour
 
 interface RouteContext {
-  params: { token: string; itemId: string };
+  params: Promise<{ token: string; itemId: string }>;
 }
 
 /**
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest, { params }: RouteContext) {
       );
     }
 
-    const { token, itemId } = params;
+    const { token, itemId } = await params;
     const supabase = createAdminClient();
 
     const { data: order, error } = await supabase
@@ -87,11 +87,19 @@ export async function GET(request: NextRequest, { params }: RouteContext) {
       throw new ApiError(404, "File is not available yet. Please contact support.");
     }
 
-    // Increment counters
-    await supabase
-      .from("order_items")
-      .update({ download_count: item.download_count + 1 })
-      .eq("id", item.id);
+    // Claim the slot atomically so concurrent requests cannot exceed the limit.
+    const { data: claimedCount, error: claimError } = await supabase.rpc(
+      "claim_download",
+      { item_row_id: item.id }
+    );
+    if (claimError) throw claimError;
+    if (Number(claimedCount) < 0) {
+      throw new ApiError(
+        429,
+        "Download limit reached. Contact streetpandacyber@gmail.com if you need more access."
+      );
+    }
+
     if (item.product_id) {
       try {
         await supabase.rpc("increment_product_downloads", {

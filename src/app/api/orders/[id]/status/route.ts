@@ -6,7 +6,7 @@ import { apiError, ApiError } from "@/lib/api/guards";
 export const runtime = "nodejs";
 
 interface RouteContext {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 /**
@@ -23,11 +23,12 @@ export async function GET(_request: NextRequest, { params }: RouteContext) {
       });
     }
 
+    const { id } = await params;
     const supabase = createAdminClient();
     const { data, error } = await supabase
       .from("orders")
       .select("id, order_number, payment_status, status, mpesa_transaction_id, download_token")
-      .eq("id", params.id)
+      .eq("id", id)
       .single();
 
     if (error || !data) throw new ApiError(404, "Order not found");
