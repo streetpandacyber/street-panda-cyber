@@ -16,8 +16,8 @@ export interface SeedPost {
 export const NEW_SEED_POSTS: SeedPost[] = [
   {
     id: "n-01",
-    title: "10 ChatGPT Prompts Every Kenyan Entrepreneur Must Use in 2024",
-    slug: "chatgpt-prompts-kenyan-entrepreneurs-2024",
+    title: "10 ChatGPT Prompts Every Kenyan Entrepreneur Must Use in 2026",
+    slug: "chatgpt-prompts-kenyan-entrepreneurs-2026",
     category: "AI",
     tags: ["chatgpt", "prompts", "kenya", "business", "entrepreneurs"],
     excerpt: "Discover the exact ChatGPT prompts helping thousands of Kenyan entrepreneurs save time and grow faster.",
@@ -42,8 +42,8 @@ export const NEW_SEED_POSTS: SeedPost[] = [
   },
   {
     id: "n-03",
-    title: "The Best Free AI Tools for Kenyan Students in 2024",
-    slug: "best-ai-tools-kenyan-students-2024",
+    title: "The Best Free AI Tools for Kenyan Students in 2026",
+    slug: "best-ai-tools-kenyan-students-2026",
     category: "AI",
     tags: ["ai", "students", "kenya", "free", "tools"],
     excerpt: "From revision planners to research helpers, these free AI tools are changing how Kenyan students study and succeed.",

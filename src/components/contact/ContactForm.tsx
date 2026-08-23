@@ -22,11 +22,34 @@ export function ContactForm() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    // In production this pipes into the support inbox (Resend/Supabase).
-    await new Promise((r) => setTimeout(r, 500));
-    setLoading(false);
-    setSent(true);
-    toast.success("Message sent! We'll reply within a few hours 💬");
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const payload = (await response.json().catch(() => null)) as
+        | { error?: string; message?: string }
+        | null;
+
+      if (!response.ok) {
+        throw new Error(
+          payload?.error ?? "We could not deliver your message. Please try again."
+        );
+      }
+
+      setSent(true);
+      toast.success(payload?.message ?? "Message received.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "We could not deliver your message. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (sent) {
@@ -102,7 +125,7 @@ export function ContactForm() {
         ) : (
           <Send className="h-4 w-4" />
         )}
-        Send Message
+        {loading ? "Sending…" : "Send Message"}
       </button>
     </form>
   );

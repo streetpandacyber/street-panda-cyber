@@ -19,7 +19,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/terms`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
   ];
 
-  const [products, posts] = await Promise.all([getProducts({}), getBlogPosts()]);
+  let products = [] as Awaited<ReturnType<typeof getProducts>>;
+  let posts = [] as Awaited<ReturnType<typeof getBlogPosts>>;
+
+  try {
+    [products, posts] = await Promise.all([getProducts({}), getBlogPosts()]);
+  } catch (error) {
+    console.error("[sitemap] catalog unavailable; returning static routes only", error);
+  }
 
   const productRoutes: MetadataRoute.Sitemap = products.map((p) => ({
     url: `${base}/products/${p.slug}`,

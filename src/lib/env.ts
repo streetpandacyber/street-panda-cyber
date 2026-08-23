@@ -25,6 +25,14 @@ export function isSupabaseAdminConfigured(): boolean {
   );
 }
 
+/** Demo catalog data is allowed only outside production. */
+export function isDemoDataAllowed(): boolean {
+  return (
+    process.env.NODE_ENV !== "production" &&
+    (process.env.ALLOW_DEMO_DATA ?? "true") === "true"
+  );
+}
+
 export function isDemoAdminAllowed(): boolean {
   return process.env.NODE_ENV !== "production" && process.env.ALLOW_DEMO_ADMIN === "true";
 }
@@ -46,5 +54,5 @@ export function isResendConfigured(): boolean {
 }
 
 export const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  process.env.NEXT_PUBLIC_APP_URL ?? "https://jm-majiwa.vercel.app";
 export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME ?? "JM Majiwa";

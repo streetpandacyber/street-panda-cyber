@@ -168,6 +168,12 @@ insert into public.products (
    true, true, false, false, 760, 540, 4.7, 73)
 on conflict (id) do nothing;
 
+-- Seed rows are fixtures only. Publish verified products from /admin/products.
+update public.products
+set is_published = false, is_featured = false, is_best_seller = false, is_new = false
+where id like '00000000-0000-4000-8000-0000000000p%'
+   or id like '00000000-0000-4000-8000-0000000001p%';
+
 -- ─── BUNDLES ───────────────────────────────────────────────────────
 insert into public.bundles (id, title, slug, description, thumbnail_url, original_price, bundle_price, is_published, is_featured) values
   ('00000000-0000-4000-8000-0000000000b1', 'Creator Starter Bundle', 'creator-starter-bundle',
@@ -183,6 +189,14 @@ insert into public.bundles (id, title, slug, description, thumbnail_url, origina
    'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=900&q=75',
    4500, 1500, true, true)
 on conflict (id) do nothing;
+
+update public.bundles
+set is_published = false, is_featured = false
+where id in (
+  '00000000-0000-4000-8000-0000000000b1',
+  '00000000-0000-4000-8000-0000000000b2',
+  '00000000-0000-4000-8000-0000000000b3'
+);
 
 insert into public.bundle_products (bundle_id, product_id, sort_order) values
   -- Creator Starter Bundle
@@ -224,13 +238,13 @@ insert into public.blog_posts (
    'From writing WhatsApp business replies to planning your next product launch — these 10 prompts will save you hours this week.',
    '<p>Most entrepreneurs in Kenya use ChatGPT like a search engine. That works, but it leaves 90% of the value on the table. The difference between a mediocre answer and a brilliant one is almost always the prompt.</p><h2>1. The M-Pesa follow-up message</h2><p>Ask ChatGPT to write three polite payment follow-up messages for different stages: 3 days overdue, 7 days overdue, and final notice.</p><h2>2. The product description generator</h2><p>Paste your product details and ask for five descriptions: one for WhatsApp status, one for Instagram, one for a website, one for a flyer, and one for a radio mention.</p><h2>3. The tender summariser</h2><p>Upload a tender document and ask ChatGPT to list the requirements, deadlines and disqualifying criteria in a table.</p><h2>Start today</h2><p>These three prompts alone save our users an average of six hours per week. Our Ultimate ChatGPT Prompt Pack 500 includes 497 more.</p>',
    'https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=900&q=75',
-   'AI & Prompts', array['chatgpt','prompts','business'], true, true, 12840, 6, '2026-07-18T08:00:00Z'),
+   'AI & Prompts', array['chatgpt','prompts','business'], false, false, 0, 6, '2026-07-18T08:00:00Z'),
 
   ('How to Use Canva Like a Pro: Complete Beginner Guide', 'how-to-use-canva-like-a-pro',
    'You do not need a design degree to create stunning content. This guide walks you through Canva from zero to confident.',
    '<p>Canva has quietly become the most powerful free tool for Kenyan creators and small businesses.</p><h2>Start with templates, not blank canvases</h2><p>Search for the format you need, pick a template close to your vision, then customise colours, fonts and photos.</p><h2>Lock a two-font system</h2><p>Choose one bold font for headings and one clean font for body text. Consistency is what makes a brand look expensive.</p><h2>Use the Brand Kit</h2><p>Save your logo, your three brand colours, and your two fonts. Every design becomes a five-minute job.</p><h2>Practice with our templates</h2><p>The fastest way to learn is to edit real designs. Our Canva Social Media Mega Pack gives you 300+ professional templates.</p>',
    'https://images.unsplash.com/photo-1626785774573-4b799315345d?auto=format&fit=crop&w=900&q=75',
-   'Design', array['canva','design','tutorial'], true, true, 9620, 8, '2026-07-10T08:00:00Z'),
+   'Design', array['canva','design','tutorial'], false, false, 0, 8, '2026-07-10T08:00:00Z'),
 
   ('AI Tools That Are Changing How Kenyans Do Business', 'ai-tools-changing-kenyan-business',
    'M-Pesa changed payments. AI is changing everything else. Here are the tools Kenyan businesses are actually using in 2026.',
@@ -256,3 +270,8 @@ insert into public.blog_posts (
    'https://images.unsplash.com/photo-1553877522-43269d4ea984?auto=format&fit=crop&w=900&q=75',
    'Business', array['creators','side-hustle','growth'], true, false, 5890, 10, '2026-05-20T08:00:00Z')
 on conflict (slug) do nothing;
+
+-- Legacy demo duplicates are kept only for reference and never published.
+update public.blog_posts
+set is_published = false, is_featured = false, updated_at = now()
+where slug in ('10-chatgpt-prompts-kenyan-entrepreneur', 'how-to-use-canva-like-a-pro');

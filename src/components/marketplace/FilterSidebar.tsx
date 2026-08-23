@@ -19,10 +19,13 @@ interface FilterSidebarProps {
   onChange: (filters: MarketplaceFilters) => void;
 }
 
-export function countActiveFilters(f: MarketplaceFilters): number {
+export function countActiveFilters(
+  f: MarketplaceFilters,
+  priceCeiling: number
+): number {
   return (
     f.categories.length +
-    (f.maxPrice < Number.MAX_SAFE_INTEGER ? 1 : 0) +
+    (f.maxPrice < priceCeiling ? 1 : 0) +
     (f.minRating > 0 ? 1 : 0) +
     f.tags.length
   );
@@ -35,7 +38,7 @@ export function FilterSidebar({
   filters,
   onChange,
 }: FilterSidebarProps) {
-  const activeCount = countActiveFilters(filters);
+  const activeCount = countActiveFilters(filters, priceCeiling);
 
   const toggleCategory = (id: string) => {
     const categories = filters.categories.includes(id)

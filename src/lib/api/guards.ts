@@ -7,6 +7,7 @@ import {
   isSupabaseAdminConfigured,
   isSupabaseConfigured,
 } from "@/lib/env";
+import { DataUnavailableError } from "@/lib/data/service";
 import type { Profile } from "@/types";
 
 export class ApiError extends Error {
@@ -20,6 +21,12 @@ export class ApiError extends Error {
 }
 
 export function apiError(err: unknown) {
+  if (err instanceof DataUnavailableError) {
+    return NextResponse.json(
+      { error: err.message },
+      { status: 503, headers: { "Retry-After": "60" } }
+    );
+  }
   if (err instanceof ApiError) {
     return NextResponse.json({ error: err.message }, { status: err.status });
   }

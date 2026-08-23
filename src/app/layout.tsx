@@ -2,8 +2,9 @@ import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
+import { APP_URL } from "@/lib/env";
 
-const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+const appUrl = APP_URL;
 const appName = process.env.NEXT_PUBLIC_APP_NAME ?? "JM Majiwa";
 const appDescription =
   process.env.NEXT_PUBLIC_APP_DESCRIPTION ??

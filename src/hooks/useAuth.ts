@@ -101,7 +101,7 @@ export function useAuth() {
   const resetPassword = useCallback(async (email: string) => {
     const supabase = createClient();
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/login`,
+      redirectTo: `${process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin}/login`,
     });
     if (error) throw new Error(error.message);
   }, []);

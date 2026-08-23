@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { isSupabaseConfigured } from "@/lib/env";
+import { APP_URL, isSupabaseConfigured } from "@/lib/env";
 
 type ActionResult = { error?: string; message?: string };
 
@@ -65,7 +65,7 @@ export async function resetPasswordAction(
   const email = String(formData.get("email") ?? "");
   const supabase = await createClient();
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/login`,
+    redirectTo: `${APP_URL}/login`,
   });
   if (error) return { error: error.message };
   return { message: "Reset link sent — check your inbox." };

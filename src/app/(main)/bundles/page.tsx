@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Check, Gift, ShieldCheck, Zap } from "lucide-react";
 import { getBundles } from "@/lib/data/service";
 import { calculateDiscount, formatPrice } from "@/lib/utils";
+import { StoreUnavailable } from "@/components/errors/StoreUnavailable";
 
 export const metadata: Metadata = {
   title: "Mega Bundles — Save Up To 67%",
@@ -14,7 +15,13 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function BundlesPage() {
-  const bundles = await getBundles();
+  let bundles;
+  try {
+    bundles = await getBundles();
+  } catch (error) {
+    console.error("[bundles] catalog unavailable", error);
+    return <StoreUnavailable />;
+  }
 
   return (
     <div>
@@ -40,8 +47,15 @@ export default async function BundlesPage() {
       <section className="section-padding bg-gray-50">
         <div className="container-custom grid gap-8 lg:grid-cols-3">
           {bundles.map((bundle, i) => {
-            const savings = bundle.original_price - bundle.bundle_price;
-            const pct = calculateDiscount(bundle.original_price, bundle.bundle_price);
+            const componentTotal = (bundle.products ?? []).reduce(
+              (sum, product) => sum + (product.sale_price ?? product.price),
+              0
+            );
+            const referencePrice = componentTotal || bundle.original_price;
+            const savings = Math.max(0, referencePrice - bundle.bundle_price);
+            const pct = referencePrice > 0
+              ? calculateDiscount(referencePrice, bundle.bundle_price)
+              : 0;
             return (
               <div
                 key={bundle.id}
@@ -99,11 +113,11 @@ export default async function BundlesPage() {
                     </p>
                   </div>
                   <Link href="/marketplace" className="btn-primary mt-5 w-full">
-                    <Gift className="h-4 w-4" /> Get This Bundle
+                    <Gift className="h-4 w-4" /> Browse Marketplace
                   </Link>
                   <p className="mt-3 text-center text-xs text-gray-400">
-                    Add the products to your cart — bundle pricing applied
-                    automatically at checkout.
+                    Open the marketplace to choose the products included in this
+                    bundle and add them to your cart.
                   </p>
                 </div>
               </div>

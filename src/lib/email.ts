@@ -6,13 +6,14 @@ interface SendEmailOptions {
   to: string;
   subject: string;
   react: React.ReactElement;
+  replyTo?: string;
 }
 
 /**
  * Sends a transactional email via Resend.
  * Silently no-ops when Resend is not configured so flows keep working.
  */
-export async function sendEmail({ to, subject, react }: SendEmailOptions) {
+export async function sendEmail({ to, subject, react, replyTo }: SendEmailOptions) {
   if (!isResendConfigured()) {
     console.info(`[email] skipped (Resend not configured) → ${to}: ${subject}`);
     return { skipped: true as const };
@@ -28,5 +29,6 @@ export async function sendEmail({ to, subject, react }: SendEmailOptions) {
     to,
     subject,
     html,
+    ...(replyTo ? { reply_to: replyTo } : {}),
   });
 }

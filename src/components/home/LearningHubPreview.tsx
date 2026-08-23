@@ -5,12 +5,10 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Calendar, Clock } from "lucide-react";
 import type { BlogPost } from "@/types";
-import { MOCK_POSTS } from "@/lib/data/mock";
 import { formatDate } from "@/lib/utils";
 
 export function LearningHubPreview({ posts: allPosts }: { posts?: BlogPost[] }) {
-  const source = allPosts && allPosts.length > 0 ? allPosts : MOCK_POSTS;
-  const posts = source.filter((p) => p.is_featured).slice(0, 3);
+  const posts = (allPosts ?? []).filter((p) => p.is_featured).slice(0, 3);
 
   return (
     <section className="section-padding bg-white">

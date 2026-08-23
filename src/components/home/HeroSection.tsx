@@ -13,13 +13,6 @@ const item: Variants = {
   show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
 };
 
-const STATS = [
-  { value: "500+", label: "Products" },
-  { value: "10,000+", label: "Customers" },
-  { value: "50,000+", label: "Downloads" },
-  { value: "4.9/5", label: "Rating" },
-];
-
 export function HeroSection() {
   return (
     <section className="hero-gradient relative overflow-hidden text-white">
@@ -51,7 +44,7 @@ export function HeroSection() {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-neon-400 opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-neon-400" />
               </span>
-              Kenya&apos;s #1 Digital Products Marketplace
+              Built for Kenyan creators, students &amp; businesses
             </span>
           </motion.div>
 
@@ -86,9 +79,9 @@ export function HeroSection() {
             variants={item}
             className="mt-6 max-w-xl text-lg leading-relaxed text-white/70"
           >
-            Prompt packs, Canva templates, eBooks and study materials — pay
-            with M-Pesa and download instantly. Built for Kenyan creators,
-            students and businesses.
+            Prompt packs, Canva templates, eBooks and study materials — with
+            clear KES pricing and local checkout options. Built for Kenyan
+            creators, students and businesses.
           </motion.p>
 
           <motion.div variants={item} className="mt-8 flex flex-wrap gap-4">
@@ -108,23 +101,14 @@ export function HeroSection() {
             </Link>
           </motion.div>
 
-          {/* Stats */}
-          <motion.dl
+          <motion.div
             variants={item}
-            className="mt-12 grid grid-cols-2 gap-6 sm:grid-cols-4"
+            className="mt-12 flex flex-wrap gap-x-6 gap-y-2 text-xs font-semibold uppercase tracking-wider text-white/60"
           >
-            {STATS.map((stat) => (
-              <div key={stat.label}>
-                <dt className="sr-only">{stat.label}</dt>
-                <dd className="text-2xl font-extrabold text-white sm:text-3xl">
-                  {stat.value}
-                </dd>
-                <p className="mt-1 text-xs font-medium uppercase tracking-wider text-white/50">
-                  {stat.label}
-                </p>
-              </div>
-            ))}
-          </motion.dl>
+            <span>Local KES pricing</span>
+            <span>Practical resources</span>
+            <span>Made for Kenya</span>
+          </motion.div>
         </div>
 
         {/* Right column — floating product mockup cards */}
@@ -141,8 +125,8 @@ export function HeroSection() {
             <Sparkles className="h-8 w-8 text-white" />
             <p className="mt-3 font-bold text-white">ChatGPT Prompt Pack</p>
             <p className="mt-1 text-sm text-white/80">500 prompts • KES 1,200</p>
-            <div className="mt-3 flex items-center gap-1 text-xs font-semibold text-white">
-              ⭐⭐⭐⭐⭐ <span className="text-white/80">4.9</span>
+            <div className="mt-3 text-xs font-semibold text-white/80">
+              Ready-to-use resource
             </div>
           </motion.div>
 
@@ -163,7 +147,7 @@ export function HeroSection() {
               300+ templates • KES 890
             </p>
             <div className="mt-3 inline-flex items-center gap-1 rounded-full bg-white/40 px-2.5 py-1 text-xs font-bold text-navy-900">
-              ⚡ Instant Download
+              Digital delivery
             </div>
           </motion.div>
 
@@ -184,7 +168,7 @@ export function HeroSection() {
               Full revision set • KES 1,500
             </p>
             <div className="mt-3 inline-flex items-center gap-1 rounded-full bg-neon-400/20 px-2.5 py-1 text-xs font-bold text-neon-300">
-              ✅ 2,600+ students
+              Exam-ready resources
             </div>
           </motion.div>
 
@@ -194,7 +178,7 @@ export function HeroSection() {
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
             className="absolute -left-4 top-56 flex items-center gap-2 rounded-full bg-neon-gradient px-4 py-2 text-sm font-bold text-navy-900 shadow-glow-neon"
           >
-            <Lock className="h-4 w-4" /> Secure Payment
+            <Lock className="h-4 w-4" /> Local checkout
           </motion.div>
           <motion.div
             animate={{ y: [0, 12, 0] }}
@@ -206,7 +190,7 @@ export function HeroSection() {
             }}
             className="absolute -right-2 bottom-20 flex items-center gap-2 rounded-full bg-orange-gradient px-4 py-2 text-sm font-bold text-white shadow-glow-orange"
           >
-            <Download className="h-4 w-4" /> Instant Download
+            <Download className="h-4 w-4" /> Digital delivery
           </motion.div>
         </motion.div>
       </motion.div>

@@ -173,7 +173,7 @@ export async function POST(request: NextRequest) {
         } else {
           discount =
             coupon.discount_type === "percentage"
-              ? Math.round((subtotal * coupon.discount_value) / 100)
+              ? Math.round((authoritativeSubtotal * coupon.discount_value) / 100)
               : coupon.discount_value;
           if (coupon.maximum_discount) {
             discount = Math.min(discount, coupon.maximum_discount);
@@ -260,7 +260,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       id: order.id,
       order_number: order.order_number,
-      subtotal,
+      subtotal: authoritativeSubtotal,
       discount,
       total,
       currency: "KES",
