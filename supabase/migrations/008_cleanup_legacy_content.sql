@@ -44,3 +44,8 @@ where id::text in (
   '00000000-0000-4000-8000-0000000000b2',
   '00000000-0000-4000-8000-0000000000b3'
 );
+
+-- The original article migration also contains synthetic view counts and copy.
+update public.blog_posts
+set is_published = false, is_featured = false, view_count = 0, updated_at = now()
+where id::text in ('n-01', 'n-02', 'n-03', 'n-04', 'n-05');
