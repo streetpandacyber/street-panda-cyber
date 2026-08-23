@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     }
 
     // User-scoped client → storage RLS applies (avatars/ folder only)
-    const supabase = createClient();
+    const supabase = await createClient();
     const path = `avatars/${user.id}${ext}`;
     const { error: upError } = await supabase.storage
       .from("media")

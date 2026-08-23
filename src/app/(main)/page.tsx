@@ -9,16 +9,28 @@ import { Testimonials } from "@/components/home/Testimonials";
 import { TrustSection } from "@/components/home/TrustSection";
 import { LearningHubPreview } from "@/components/home/LearningHubPreview";
 import { NewsletterSection } from "@/components/home/NewsletterSection";
+import { StoreUnavailable } from "@/components/errors/StoreUnavailable";
 
 export const dynamic = "force-dynamic";
 
-export default async function HomePage() {
-  const [bundles, posts, categories] = await Promise.all([
-    getBundles(),
-    getBlogPosts(),
-    getCategoriesWithCounts(),
-  ]);
+async function loadHomeData() {
+  try {
+    return await Promise.all([
+      getBundles(),
+      getBlogPosts(),
+      getCategoriesWithCounts(),
+    ] as const);
+  } catch (error) {
+    console.error("[home] storefront data unavailable", error);
+    return null;
+  }
+}
 
+export default async function HomePage() {
+  const data = await loadHomeData();
+  if (!data) return <StoreUnavailable />;
+
+  const [bundles, posts, categories] = data;
   return (
     <>
       <HeroSection />

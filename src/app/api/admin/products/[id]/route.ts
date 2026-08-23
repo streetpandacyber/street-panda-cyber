@@ -5,18 +5,19 @@ import { apiError, ApiError, requireAdmin } from "@/lib/api/guards";
 export const runtime = "nodejs";
 
 interface RouteContext {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 /** GET /api/admin/products/[id] — single product for editing. */
 export async function GET(_request: NextRequest, { params }: RouteContext) {
   try {
     await requireAdmin();
+    const { id } = await params;
     const supabase = createAdminClient();
     const { data, error } = await supabase
       .from("products")
       .select("*, category:categories(*)")
-      .eq("id", params.id)
+      .eq("id", id)
       .single();
     if (error || !data) throw new ApiError(404, "Product not found");
     return NextResponse.json({ data });
@@ -29,6 +30,7 @@ export async function GET(_request: NextRequest, { params }: RouteContext) {
 export async function PUT(request: NextRequest, { params }: RouteContext) {
   try {
     await requireAdmin();
+    const { id } = await params;
     const body = await request.json();
 
     const allowed = {
@@ -63,7 +65,7 @@ export async function PUT(request: NextRequest, { params }: RouteContext) {
     const { data, error } = await supabase
       .from("products")
       .update(cleaned)
-      .eq("id", params.id)
+      .eq("id", id)
       .select()
       .single();
     if (error || !data) throw new ApiError(404, "Product not found");
@@ -77,11 +79,12 @@ export async function PUT(request: NextRequest, { params }: RouteContext) {
 export async function DELETE(_request: NextRequest, { params }: RouteContext) {
   try {
     await requireAdmin();
+    const { id } = await params;
     const supabase = createAdminClient();
     const { error } = await supabase
       .from("products")
       .update({ is_published: false, is_featured: false, is_best_seller: false })
-      .eq("id", params.id);
+      .eq("id", id);
     if (error) throw new ApiError(500, "Could not delete product");
     return NextResponse.json({ success: true });
   } catch (err) {

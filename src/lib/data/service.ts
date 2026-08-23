@@ -1,12 +1,12 @@
 /**
  * Server-side data access layer.
  *
- * Every function tries Supabase first (when configured) and gracefully
- * falls back to the bundled demo data, so the marketplace is fully
- * browsable out of the box.
+ * Every function tries Supabase first (when configured). Bundled demo data is
+ * available only outside production; production fails closed when live data is
+ * unavailable so synthetic catalog content cannot reach customers.
  */
 import type { BlogPost, Bundle, Category, Product } from "@/types";
-import { isSupabaseConfigured } from "@/lib/env";
+import { isDemoDataAllowed, isSupabaseConfigured } from "@/lib/env";
 import { createClient } from "@/lib/supabase/server";
 import {
   MOCK_BUNDLES,
@@ -14,6 +14,18 @@ import {
   MOCK_POSTS_ALL,
   MOCK_PRODUCTS,
 } from "./mock";
+
+export class DataUnavailableError extends Error {
+  constructor(resource: string) {
+    super(`${resource} are temporarily unavailable. Please try again shortly.`);
+    this.name = "DataUnavailableError";
+  }
+}
+
+function demoOrThrow<T>(fallback: T, resource: string): T {
+  if (isDemoDataAllowed()) return fallback;
+  throw new DataUnavailableError(resource);
+}
 
 export type ProductSort =
   | "newest"
@@ -30,12 +42,13 @@ export interface ProductQuery {
 }
 
 async function trySupabase<T>(
-  fn: (db: ReturnType<typeof createClient>) => Promise<T | null>
+  fn: (db: Awaited<ReturnType<typeof createClient>>) => Promise<T | null>
 ): Promise<T | null> {
   if (!isSupabaseConfigured()) return null;
   try {
-    return await fn(createClient());
-  } catch {
+    return await fn(await createClient());
+  } catch (error) {
+    console.error("[data] Supabase query failed", error);
     return null;
   }
 }
@@ -49,7 +62,7 @@ export async function getCategories(): Promise<Category[]> {
     if (error || !data?.length) return null;
     return data as Category[];
   });
-  return db ?? MOCK_CATEGORIES;
+  return db ?? demoOrThrow(MOCK_CATEGORIES, "Categories");
 }
 
 export async function getProducts(query: ProductQuery = {}): Promise<Product[]> {
@@ -132,7 +145,7 @@ export async function getProducts(query: ProductQuery = {}): Promise<Product[]> 
       );
   }
   if (query.limit) products = products.slice(0, query.limit);
-  return products;
+  return demoOrThrow(products, "Products");
 }
 
 export async function getProductBySlug(slug: string): Promise<Product | null> {
@@ -145,7 +158,9 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
     if (error || !data) return null;
     return data as unknown as Product;
   });
-  return db ?? MOCK_PRODUCTS.find((p) => p.slug === slug) ?? null;
+  if (db) return db;
+  if (!isDemoDataAllowed()) throw new DataUnavailableError("Products");
+  return MOCK_PRODUCTS.find((p) => p.slug === slug) ?? null;
 }
 
 export async function getRelatedProducts(
@@ -176,7 +191,7 @@ export async function getBundles(): Promise<Bundle[]> {
         .filter((prod): prod is Product => Boolean(prod)),
     }));
   });
-  return db ?? MOCK_BUNDLES;
+  return db ?? demoOrThrow(MOCK_BUNDLES, "Bundles");
 }
 
 export async function getBundleBySlug(slug: string): Promise<Bundle | null> {
@@ -194,7 +209,7 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
     if (error || !data?.length) return null;
     return data as BlogPost[];
   });
-  return db ?? MOCK_POSTS_ALL;
+  return db ?? demoOrThrow(MOCK_POSTS_ALL, "Blog posts");
 }
 
 export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
@@ -207,7 +222,9 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
     if (error || !data) return null;
     return data as BlogPost;
   });
-  return db ?? MOCK_POSTS_ALL.find((p) => p.slug === slug) ?? null;
+  if (db) return db;
+  if (!isDemoDataAllowed()) throw new DataUnavailableError("Blog posts");
+  return MOCK_POSTS_ALL.find((p) => p.slug === slug) ?? null;
 }
 
 /* ───────────── Extended queries for the backend API ───────────── */
@@ -294,10 +311,13 @@ export async function getProductsPaged(q: PagedQuery = {}): Promise<Paged<Produc
   const filtered = applyDemoFilters(MOCK_PRODUCTS, q);
   const page = q.page ?? 1;
   const limit = q.limit ?? 12;
-  return {
-    items: filtered.slice((page - 1) * limit, page * limit),
-    total: filtered.length,
-  };
+  return demoOrThrow(
+    {
+      items: filtered.slice((page - 1) * limit, page * limit),
+      total: filtered.length,
+    },
+    "Products"
+  );
 }
 
 export async function getCategoriesWithCounts(): Promise<
@@ -322,10 +342,13 @@ export async function getCategoriesWithCounts(): Promise<
 
   if (db) return db;
 
-  return MOCK_CATEGORIES.map((c) => ({
-    ...c,
-    product_count: MOCK_PRODUCTS.filter((p) => p.category_id === c.id).length,
-  }));
+  return demoOrThrow(
+    MOCK_CATEGORIES.map((c) => ({
+      ...c,
+      product_count: MOCK_PRODUCTS.filter((p) => p.category_id === c.id).length,
+    })),
+    "Categories"
+  );
 }
 
 export async function searchProducts(q: string, limit = 10): Promise<Product[]> {
@@ -342,5 +365,8 @@ export async function searchProducts(q: string, limit = 10): Promise<Product[]> 
     return data as unknown as Product[];
   });
   if (db) return db;
-  return applyDemoFilters(MOCK_PRODUCTS, { search: q }).slice(0, limit);
+  return demoOrThrow(
+    applyDemoFilters(MOCK_PRODUCTS, { search: q }).slice(0, limit),
+    "Products"
+  );
 }

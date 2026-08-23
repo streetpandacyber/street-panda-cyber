@@ -2,7 +2,12 @@ import { NextResponse } from "next/server";
 import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { isSupabaseConfigured } from "@/lib/env";
+import {
+  isDemoAdminAllowed,
+  isSupabaseAdminConfigured,
+  isSupabaseConfigured,
+} from "@/lib/env";
+import { DataUnavailableError } from "@/lib/data/service";
 import type { Profile } from "@/types";
 
 export class ApiError extends Error {
@@ -16,6 +21,12 @@ export class ApiError extends Error {
 }
 
 export function apiError(err: unknown) {
+  if (err instanceof DataUnavailableError) {
+    return NextResponse.json(
+      { error: err.message },
+      { status: 503, headers: { "Retry-After": "60" } }
+    );
+  }
   if (err instanceof ApiError) {
     return NextResponse.json({ error: err.message }, { status: err.status });
   }
@@ -30,7 +41,7 @@ export function apiError(err: unknown) {
 export async function getAuthUser(): Promise<User | null> {
   if (!isSupabaseConfigured()) return null;
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data } = await supabase.auth.getUser();
     return data.user;
   } catch {
@@ -64,6 +75,13 @@ export async function requireAdmin(): Promise<{
   demo: boolean;
 }> {
   if (!isSupabaseConfigured()) {
+    if (!isDemoAdminAllowed()) {
+      throw new ApiError(
+        503,
+        "Admin access is unavailable until Supabase is configured."
+      );
+    }
+
     return {
       user: null,
       demo: true,
@@ -79,6 +97,14 @@ export async function requireAdmin(): Promise<{
       },
     };
   }
+
+  if (!isSupabaseAdminConfigured()) {
+    throw new ApiError(
+      503,
+      "Admin access requires the Supabase service-role key."
+    );
+  }
+
   const user = await requireUser();
   const profile = await getProfile(user.id);
   if (!profile?.is_admin) throw new ApiError(403, "Admin access required");

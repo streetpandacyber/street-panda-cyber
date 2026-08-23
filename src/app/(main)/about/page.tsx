@@ -63,10 +63,10 @@ const TEAM = [
 ];
 
 const STATS = [
-  { value: "10,000+", label: "Happy customers" },
-  { value: "50,000+", label: "Downloads delivered" },
-  { value: "500+", label: "Products & templates" },
-  { value: "4.9/5", label: "Average rating" },
+  { value: "KES", label: "Local pricing" },
+  { value: "M-Pesa", label: "Local checkout" },
+  { value: "Digital", label: "Instant access when enabled" },
+  { value: "Kenya", label: "Built for local needs" },
 ];
 
 export default function AboutPage() {
@@ -115,10 +115,9 @@ export default function AboutPage() {
                 aligned to our curriculum.
               </p>
               <p>
-                Today, JM Majiwa serves over 10,000 customers across all 47
-                counties — creators, students, teachers and entrepreneurs — and
-                every product still follows the same rule: it must save you
-                hours or earn you money.
+                Today, JM Majiwa is building for creators, students, teachers and
+                entrepreneurs across Kenya. Every product still follows the same
+                rule: it must save you hours or help you move forward.
               </p>
             </div>
           </div>
@@ -187,7 +186,7 @@ export default function AboutPage() {
       <section className="section-padding bg-gray-50">
         <div className="container-custom text-center">
           <Heart className="mx-auto h-10 w-10 text-orange-500" />
-          <h2 className="section-title mt-4">Join 10,000+ Kenyans Growing With Us</h2>
+          <h2 className="section-title mt-4">Find Your Next Useful Resource</h2>
           <p className="section-subtitle mt-4">
             Your next level is one download away.
           </p>

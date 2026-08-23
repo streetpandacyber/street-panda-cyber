@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { getBlogPosts } from "@/lib/data/service";
 import { PostCard } from "@/components/blog/BlogBrowser";
+import { StoreUnavailable } from "@/components/errors/StoreUnavailable";
 
 export const metadata: Metadata = {
   title: "Learning Hub — Level Up Your Skills",
@@ -65,7 +66,13 @@ const FREE_RESOURCES = [
 ];
 
 export default async function LearningHubPage() {
-  const posts = await getBlogPosts();
+  let posts;
+  try {
+    posts = await getBlogPosts();
+  } catch (error) {
+    console.error("[learning-hub] content unavailable", error);
+    return <StoreUnavailable />;
+  }
   const tutorials = posts.slice(0, 6);
 
   return (

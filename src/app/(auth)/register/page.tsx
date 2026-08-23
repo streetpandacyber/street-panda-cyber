@@ -52,7 +52,7 @@ export default function RegisterPage() {
             phone: form.phone,
             newsletter_subscribed: newsletter,
           },
-          emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
+          emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin}/auth/callback`,
         },
       });
       if (err) throw new Error(err.message);

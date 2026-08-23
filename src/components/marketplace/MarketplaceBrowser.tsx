@@ -120,7 +120,7 @@ export function MarketplaceBrowser({
     return list;
   }, [products, search, filters, sort, priceCeiling]);
 
-  const activeCount = countActiveFilters(filters);
+  const activeCount = countActiveFilters(filters, priceCeiling);
   const shown = filtered.slice(0, visible);
 
   const chips: { label: string; clear: () => void }[] = [

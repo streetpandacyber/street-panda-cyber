@@ -48,7 +48,10 @@ export function getInitials(name: string): string {
 }
 
 export function generateDownloadUrl(token: string, itemId: string): string {
-  return `${process.env.NEXT_PUBLIC_APP_URL}/api/downloads/${token}/${itemId}`;
+  const appUrl =
+    process.env.NEXT_PUBLIC_APP_URL ??
+    (typeof window !== "undefined" ? window.location.origin : "https://jm-majiwa.vercel.app");
+  return `${appUrl}/api/downloads/${token}/${itemId}`;
 }
 
 export function formatFileSize(bytes: number): string {

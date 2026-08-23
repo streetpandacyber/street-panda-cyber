@@ -25,6 +25,18 @@ import { Card, inputCls, labelCls, selectCls } from "@/components/admin/ui";
 
 const CATEGORIES = ["AI", "ChatGPT", "Canva", "Business", "Kenya", "SEO", "Marketing", "Design", "Education"];
 
+const MARKDOWN_TOOLS = [
+  { icon: Bold, label: "Bold", before: "**", after: "**", block: false },
+  { icon: Italic, label: "Italic", before: "*", after: "*", block: false },
+  { icon: Heading2, label: "H2", before: "## ", after: "", block: true },
+  { icon: Heading3, label: "H3", before: "### ", after: "", block: true },
+  { icon: LinkIcon, label: "Link", before: "[", after: "](https://)", block: false },
+  { icon: ImageIcon, label: "Image", before: "![alt](", after: ")", block: true },
+  { icon: Code, label: "Code", before: "```\\n", after: "\\n```", block: true },
+  { icon: Quote, label: "Quote", before: "> ", after: "", block: true },
+  { icon: List, label: "List", before: "- ", after: "", block: true },
+] as const;
+
 interface PostEditorProps {
   initial?: BlogPost | null;
   editId?: string;
@@ -74,17 +86,6 @@ export function PostEditor({ initial, editId, authorName = "JM Majiwa Admin" }: 
     });
   };
 
-  const tools: { icon: React.ComponentType<{ className?: string }>; label: string; run: () => void }[] = [
-    { icon: Bold, label: "Bold", run: () => insertMd("**", "**") },
-    { icon: Italic, label: "Italic", run: () => insertMd("*", "*") },
-    { icon: Heading2, label: "H2", run: () => insertMd("## ", "", true) },
-    { icon: Heading3, label: "H3", run: () => insertMd("### ", "", true) },
-    { icon: LinkIcon, label: "Link", run: () => insertMd("[", "](https://)") },
-    { icon: ImageIcon, label: "Image", run: () => insertMd("![alt](", ")", true) },
-    { icon: Code, label: "Code", run: () => insertMd("```\n", "\n```", true) },
-    { icon: Quote, label: "Quote", run: () => insertMd("> ", "", true) },
-    { icon: List, label: "List", run: () => insertMd("- ", "", true) },
-  ];
 
   const uploadCover = async (file: File | undefined) => {
     if (!file) return;
@@ -204,10 +205,16 @@ export function PostEditor({ initial, editId, authorName = "JM Majiwa Admin" }: 
             </h2>
             {/* toolbar */}
             <div className="mt-4 flex flex-wrap gap-1 rounded-t-2xl border border-white/10 bg-white/5 p-2">
-              {tools.map((t) => {
+              {MARKDOWN_TOOLS.map((t) => {
                 const Icon = t.icon;
                 return (
-                  <button key={t.label} type="button" title={t.label} onClick={t.run} className="rounded-lg p-2 text-white/60 hover:bg-white/10 hover:text-white">
+                  <button
+                    key={t.label}
+                    type="button"
+                    title={t.label}
+                    onClick={() => insertMd(t.before, t.after, t.block)}
+                    className="rounded-lg p-2 text-white/60 hover:bg-white/10 hover:text-white"
+                  >
                     <Icon className="h-4 w-4" />
                   </button>
                 );

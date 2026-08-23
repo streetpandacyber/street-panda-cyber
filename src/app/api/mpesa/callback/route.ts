@@ -43,6 +43,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ResultCode: 0, ResultDesc: "Accepted" });
     }
 
+    // Daraja can retry callbacks. Never issue another token or send another
+    // confirmation email after the order has already been marked paid.
+    if (order.payment_status === "paid") {
+      return NextResponse.json({ ResultCode: 0, ResultDesc: "Accepted" });
+    }
+
     if (resultCode === 0) {
       // ── Payment successful ────────────────────────────────
       const metadata: Array<{ Name: string; Value?: string }> =
@@ -55,7 +61,7 @@ export async function POST(request: NextRequest) {
         Date.now() + 365 * 24 * 60 * 60 * 1000
       ).toISOString();
 
-      await supabase
+      const { data: claimedOrder, error: claimError } = await supabase
         .from("orders")
         .update({
           payment_status: "paid",
@@ -65,7 +71,15 @@ export async function POST(request: NextRequest) {
           download_expires_at: expiresAt,
           updated_at: new Date().toISOString(),
         })
-        .eq("id", order.id);
+        .eq("id", order.id)
+        .neq("payment_status", "paid")
+        .select("id")
+        .maybeSingle();
+
+      if (claimError) throw claimError;
+      if (!claimedOrder) {
+        return NextResponse.json({ ResultCode: 0, ResultDesc: "Accepted" });
+      }
 
       // Increment product sales counters
       for (const item of order.order_items ?? []) {
@@ -113,7 +127,8 @@ export async function POST(request: NextRequest) {
           status: "cancelled",
           updated_at: new Date().toISOString(),
         })
-        .eq("id", order.id);
+        .eq("id", order.id)
+        .neq("payment_status", "paid");
     }
 
     return NextResponse.json({ ResultCode: 0, ResultDesc: "Accepted" });

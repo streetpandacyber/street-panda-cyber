@@ -47,6 +47,7 @@ const tooltipStyle = {
 export default function AdminAnalyticsPage() {
   const [days, setDays] = useState(30);
   const { analytics, fetchAnalytics } = useAdmin();
+  const [local, setLocal] = useState<typeof analytics>(null);
 
   useEffect(() => {
     fetchAnalytics().catch(() => undefined);
@@ -60,7 +61,6 @@ export default function AdminAnalyticsPage() {
       .catch(() => undefined);
   }, [days]);
 
-  const [local, setLocal] = useState<typeof analytics>(null);
   const a = local ?? analytics;
 
   if (!a) {

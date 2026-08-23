@@ -17,7 +17,7 @@ export default async function AdminLayout({
   let pendingOrders = 1;
 
   if (!demo) {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data } = await supabase.auth.getUser();
 
     // Not logged in → login page

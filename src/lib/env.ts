@@ -16,6 +16,27 @@ export function isSupabaseConfigured(): boolean {
   );
 }
 
+export function isSupabaseAdminConfigured(): boolean {
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
+  return (
+    isSupabaseConfigured() &&
+    serviceRoleKey.length > 20 &&
+    !serviceRoleKey.startsWith("your_")
+  );
+}
+
+/** Demo catalog data is allowed only outside production. */
+export function isDemoDataAllowed(): boolean {
+  return (
+    process.env.NODE_ENV !== "production" &&
+    (process.env.ALLOW_DEMO_DATA ?? "true") === "true"
+  );
+}
+
+export function isDemoAdminAllowed(): boolean {
+  return process.env.NODE_ENV !== "production" && process.env.ALLOW_DEMO_ADMIN === "true";
+}
+
 export function isMpesaConfigured(): boolean {
   const key = process.env.MPESA_CONSUMER_KEY ?? "";
   const secret = process.env.MPESA_CONSUMER_SECRET ?? "";
@@ -33,5 +54,5 @@ export function isResendConfigured(): boolean {
 }
 
 export const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  process.env.NEXT_PUBLIC_APP_URL ?? "https://jm-majiwa.vercel.app";
 export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME ?? "JM Majiwa";

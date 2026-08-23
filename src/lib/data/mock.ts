@@ -793,7 +793,7 @@ export const MOCK_POSTS_ALL: BlogPost[] = [
     created_at: "2026-08-02T08:00:00Z",
     updated_at: "2026-08-02T08:00:00Z",
   })),
-  ...MOCK_POSTS,
+  ...MOCK_POSTS.filter((post) => !["g-01", "g-02"].includes(post.id)),
 ];
 
 /* ─────────────────────────── TESTIMONIALS ───────────────────────── */
