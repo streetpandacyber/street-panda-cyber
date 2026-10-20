@@ -1,0 +1,39 @@
+{
+  "name": "jm-panda-remotion-video",
+  "version": "1.0.0",
+  "description": "JM Majiwa 15-second vertical promo built with Remotion (1080x1920, 30fps).",
+  "repository": {},
+  "license": "UNLICENSED",
+  "engines": {
+    "node": "^20.19.0 || ^22.13.0 || >=24"
+  },
+  "private": true,
+  "dependencies": {
+    "@remotion/cli": "4.0.537",
+    "@remotion/transitions": "4.0.537",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "remotion": "4.0.537"
+  },
+  "devDependencies": {
+    "@remotion/eslint-config-flat": "4.0.537",
+    "@sparticuz/chromium": "141.0.0",
+    "@types/react": "19.2.7",
+    "@types/web": "0.0.166",
+    "eslint": "10.12.0",
+    "prettier": "3.8.1",
+    "typescript": "5.9.3"
+  },
+  "scripts": {
+    "dev": "remotion studio",
+    "build": "remotion bundle",
+    "upgrade": "remotion upgrade",
+    "lint": "eslint src && tsc",
+    "render": "remotion render JMMajiwaPromo renders/jm-panda-promo.mp4",
+    "render:sandbox": "eval \"$(node scripts/extract-chromium.mjs)\" && remotion render JMMajiwaPromo renders/jm-panda-promo.mp4",
+    "poster": "remotion still JMMajiwaPromo renders/poster.png --frame=435"
+  },
+  "allowScripts": {
+    "esbuild": false
+  }
+}
